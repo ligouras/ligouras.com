@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ligouras — Coming Soon</title>
+  <meta name="description" content="ligouras.com is coming soon." />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Ligouras — Coming Soon" />
+  <meta property="og:description" content="Something new is on the way." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://ligouras.com/" />
+
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>L</text></svg>" />
+
+  <!-- Fonts: Archivo (headings) + Space Grotesk (body) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700&family=Space+Grotesk:wght@400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg: #09090b;          /* deep OLED black */
+      --surface: #18181b;
+      --fg: #fafafa;          /* primary text */
+      --muted: #a1a1aa;       /* secondary text */
+      --border: #27272a;
+      --accent: #2563eb;      /* brand blue */
+      --accent-hover: #3b82f6;
+      --radius: 12px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body { height: 100%; }
+
+    body {
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: var(--bg);
+      background-image:
+        radial-gradient(60% 60% at 50% 0%, rgba(37, 99, 235, 0.18) 0%, transparent 70%);
+      color: var(--fg);
+      font-family: "Space Grotesk", system-ui, -apple-system, sans-serif;
+      line-height: 1.6;
+      padding: 24px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    main {
+      width: 100%;
+      max-width: 560px;
+      text-align: center;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8125rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 6px 14px;
+      margin-bottom: 32px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 10px var(--accent);
+      animation: pulse 2.4s ease-in-out infinite;
+    }
+
+    h1 {
+      font-family: "Archivo", system-ui, sans-serif;
+      font-weight: 700;
+      font-size: clamp(2.75rem, 12vw, 4.5rem);
+      letter-spacing: -0.03em;
+      line-height: 1.05;
+      margin-bottom: 16px;
+      text-shadow: 0 0 28px rgba(250, 250, 250, 0.12);
+    }
+
+    h1 .accent { color: var(--accent); }
+
+    .tagline {
+      font-size: clamp(1rem, 4vw, 1.2rem);
+      color: var(--muted);
+      max-width: 38ch;
+      margin: 0 auto 40px;
+    }
+
+    nav.social {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .social a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--muted);
+      transition: color 200ms ease, border-color 200ms ease, transform 200ms ease, background 200ms ease;
+    }
+
+    .social a:hover {
+      color: var(--fg);
+      border-color: var(--accent);
+      background: #1f2030;
+      transform: translateY(-2px);
+    }
+
+    .social a:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+    }
+
+    .social svg { width: 22px; height: 22px; }
+
+    footer {
+      margin-top: 56px;
+      font-size: 0.8125rem;
+      color: var(--muted);
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .dot { animation: none; }
+      .social a { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <span class="eyebrow"><span class="dot" aria-hidden="true"></span> Coming Soon</span>
+
+    <h1>ligouras<span class="accent">.</span></h1>
+
+    <p class="tagline">Something new is on the way. Check back soon.</p>
+
+    <nav class="social" aria-label="Social links">
+      <a href="https://github.com/ligouras" aria-label="GitHub" rel="me noopener" target="_blank">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.73.5.5 5.73.5 12.01c0 5.02 3.26 9.27 7.78 10.78.57.1.78-.25.78-.55 0-.27-.01-.99-.02-1.95-3.17.69-3.84-1.53-3.84-1.53-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.75 1.18 1.75 1.18 1.02 1.75 2.68 1.25 3.34.95.1-.74.4-1.25.72-1.54-2.53-.29-5.19-1.27-5.19-5.62 0-1.24.44-2.26 1.17-3.06-.12-.29-.51-1.45.11-3.02 0 0 .96-.31 3.15 1.17a10.9 10.9 0 0 1 2.87-.39c.97 0 1.95.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.73.11 3.02.73.8 1.17 1.82 1.17 3.06 0 4.36-2.67 5.32-5.21 5.61.41.35.78 1.05.78 2.12 0 1.53-.01 2.76-.01 3.14 0 .3.2.66.79.55A11.52 11.52 0 0 0 23.5 12.01C23.5 5.73 18.27.5 12 .5Z"/></svg>
+      </a>
+      <a href="https://www.linkedin.com/in/ligouras" aria-label="LinkedIn" rel="me noopener" target="_blank">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.13 1.45-2.13 2.94v5.67H9.35V9h3.42v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29ZM5.34 7.43a2.07 2.07 0 1 1 0-4.14 2.07 2.07 0 0 1 0 4.14ZM7.12 20.45H3.56V9h3.56v11.45ZM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0Z"/></svg>
+      </a>
+      <a href="https://x.com/ligouras" aria-label="X (Twitter)" rel="me noopener" target="_blank">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.24 2.25h3.31l-7.23 8.26 8.5 11.24h-6.66l-5.22-6.82-5.97 6.82H1.66l7.73-8.84L1.25 2.25h6.83l4.71 6.23 5.45-6.23Zm-1.16 17.52h1.83L7.01 4.13H5.05l12.03 15.64Z"/></svg>
+      </a>
+    </nav>
+
+    <footer>&copy; <span id="year">2026</span> Spyros Ligouras</footer>
+  </main>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
