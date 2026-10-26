@@ -12,3 +12,7 @@
 
 # Playwright MCP scratch output
 .playwright-mcp/
+
+# Book source files
+*.pdf
+*.epub
