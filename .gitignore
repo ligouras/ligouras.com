@@ -9,3 +9,6 @@
 .vscode/
 .idea/
 
+
+# Playwright MCP scratch output
+.playwright-mcp/
