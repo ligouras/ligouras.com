@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hashimoto’s Thyroiditis Reference Library</title>
+  <style>
+    :root {
+      --bg: #faf8f5;
+      --card: #ffffff;
+      --text: #22201e;
+      --muted: #5c574f;
+      --accent: #7c3f2c;
+      --border: #e2ddd3;
+      --font-serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+      --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-serif);
+      line-height: 1.65;
+      padding: 3rem 1.5rem 5rem;
+    }
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+    }
+    header {
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+    h1 {
+      font-family: var(--font-sans);
+      font-size: 2.1rem;
+      margin: 0 0 0.5rem 0;
+    }
+    .subtitle {
+      color: var(--muted);
+      font-size: 1.05rem;
+      margin: 0;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+      gap: 1.75rem;
+    }
+    .book-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.5rem;
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 1.35rem;
+      text-decoration: none;
+      color: inherit;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+    }
+    .book-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--accent);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+    }
+    .book-card img {
+      width: 100%;
+      border-radius: 6px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    }
+    .book-card h2 {
+      font-family: var(--font-sans);
+      font-size: 1.2rem;
+      margin: 0 0 0.25rem 0;
+      color: var(--accent);
+    }
+    .book-meta {
+      font-family: var(--font-sans);
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-bottom: 0.65rem;
+    }
+    .book-desc {
+      font-size: 0.92rem;
+      margin: 0;
+      color: var(--text);
+    }
+    @media (max-width: 600px) {
+      .grid { grid-template-columns: 1fr; }
+      .book-card { grid-template-columns: 90px 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Hashimoto’s Thyroiditis Reference Library</h1>
+      <p class="subtitle">4 complete, unabridged books formatted in clean, semantic HTML for human and LLM reading.</p>
+    </header>
+    <div class="grid">
+      <a class="book-card" href="hashimotos-thyroiditis-root-cause/index.html">
+        <img src="hashimotos-thyroiditis-root-cause/images/cover.png" alt="Hashimoto's Thyroiditis: Lifestyle Interventions for Finding and Treating the Root Cause" />
+        <div>
+          <h2>Hashimoto’s Thyroiditis: Lifestyle Interventions for Finding and Treating the Root Cause</h2>
+          <div class="book-meta">Izabella Wentz, PharmD &amp; Marta Nowosadzka, MD (2015) &bull; 20 Chapters &bull; 87k words</div>
+          <p class="book-desc">The foundational root-cause clinical guide covering thyroid physiology, medication types and conversions, nutrient depletions, the iodine controversy, gut permeability, infections, adrenal dysfunction, toxins, diets, supplements, and lab testing.</p>
+        </div>
+      </a>
+
+      <a class="book-card" href="hashimotos-protocol/index.html">
+        <img src="hashimotos-protocol/images/9780062571304_Cover.jpg" alt="Hashimoto's Protocol" />
+        <div>
+          <h2>Hashimoto’s Protocol: A 90-Day Plan for Reversing Thyroid Symptoms and Getting Your Life Back</h2>
+          <div class="book-meta">Izabella Wentz, PharmD (2017) &bull; 12 Chapters &bull; 100k words</div>
+          <p class="book-desc">A step-by-step 90-day clinical and lifestyle protocol featuring the Fundamental Protocols (Liver Support, Adrenal Recovery, Gut Balance) and Advanced Protocols, self-assessments, checklists, and targeted protocols.</p>
+        </div>
+      </a>
+
+      <a class="book-card" href="hashimotos-food-pharmacology/index.html">
+        <img src="hashimotos-food-pharmacology/images/9780062571632_Cover.jpg" alt="Hashimoto's Food Pharmacology" />
+        <div>
+          <h2>Hashimoto’s Food Pharmacology: Nutrition Protocols and Healing Recipes</h2>
+          <div class="book-meta">Izabella Wentz, PharmD (2019) &bull; 5 Chapters + 125 Recipes &bull; 93k words</div>
+          <p class="book-desc">Nutrition protocols (Root Cause Intro, Paleo, and Autoimmune diets), meal plans, digestive support strategies, and 125 thyroid-supporting recipes with full nutritional analyses.</p>
+        </div>
+      </a>
+
+      <a class="book-card" href="hashimotos-aip-cookbook/index.html">
+        <img src="hashimotos-aip-cookbook/images/cover.jpeg" alt="The Hashimoto's AIP Cookbook" />
+        <div>
+          <h2>The Hashimoto’s AIP Cookbook: Easy Recipes for Thyroid Healing on the Paleo Autoimmune Protocol</h2>
+          <div class="book-meta">Emily Kyle, MS, RDN, CLT, HCP &amp; Phil Kyle, Chef (2019) &bull; 9 Chapters + 105 Recipes &bull; 42k words</div>
+          <p class="book-desc">Practical guide to the Paleo Autoimmune Protocol (AIP) for Hashimoto's, with a two-week meal plan, food reintroduction tracker, and over 100 easy 5-ingredient, 30-minute, one-pot, and make-ahead recipes.</p>
+        </div>
+      </a>
+    </div>
+  </div>
+</body>
+</html>
+
