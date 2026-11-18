@@ -1,0 +1,456 @@
+---
+import { loadProfile } from "../../lib/profile";
+
+const profile = loadProfile();
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{profile.name} — Curriculum Vitae</title>
+    <meta name="description" content={`Curriculum Vitae of ${profile.name} (${profile.headline})`} />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>L</text></svg>"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700&family=Space+Grotesk:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="toolbar no-print">
+      <a class="toolbar-link" href="/">← ligouras.com</a>
+      <div class="toolbar-actions">
+        <a class="toolbar-btn" href="/cv.pdf" download="Spyros-Ligouras-CV.pdf">Download PDF</a>
+        <button class="toolbar-btn toolbar-btn-primary" type="button" onclick="window.print()">Print</button>
+      </div>
+    </div>
+
+    <main class="sheet">
+      <header class="cv-header">
+        <div>
+          <h1>{profile.name}</h1>
+          <p class="headline">{profile.headline}</p>
+        </div>
+        <ul class="contact-list">
+          <li>{profile.location}</li>
+          <li><a href={profile.website}>ligouras.com</a></li>
+          <li><a href={profile.github}>github.com/{profile.githubUsername}</a></li>
+          <li><a href={profile.linkedin}>linkedin.com/in/spyrosligouras</a></li>
+        </ul>
+      </header>
+
+      <section class="cv-section">
+        <h2>Profile</h2>
+        <p class="summary">{profile.summary}</p>
+      </section>
+
+      <section class="cv-section">
+        <h2>Ventures</h2>
+        <div class="entries">
+          {
+            profile.ventures.map((v) => (
+              <div class="entry">
+                <div class="entry-head">
+                  <div>
+                    <strong>{v.name}</strong> — <span class="role">{v.role}</span>
+                  </div>
+                  <span class="period">{v.period} · {v.location}</span>
+                </div>
+                <p class="entry-desc">
+                  {v.summary}{" "}
+                  <a href={v.url}>{v.url.replace(/^https?:\/\//, "").replace(/\/$/, "")}</a>
+                </p>
+              </div>
+            ))
+          }
+        </div>
+      </section>
+
+      <section class="cv-section">
+        <h2>Experience</h2>
+        <div class="entries">
+          {
+            profile.experience.map((exp) => (
+              <div class="entry">
+                <div class="entry-head">
+                  <div>
+                    <strong>{exp.company}</strong>
+                    {exp.subroles.length === 0 && (
+                      <> — <span class="role">{exp.role}</span></>
+                    )}
+                  </div>
+                  <span class="period">{exp.period} · {exp.location}</span>
+                </div>
+                {exp.subroles.length > 0 && (
+                  <div class="subroles">
+                    {exp.subroles.map((sr) => (
+                      <div class="subrole">
+                        <span class="role">{sr.title}</span>
+                        <span class="period">{sr.period}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {(exp.bullets.length > 0 || exp.projects.length > 0) && (
+                  <ul class="bullets">
+                    {exp.bullets.map((b) => (
+                      <li>{b}</li>
+                    ))}
+                    {exp.projects.length > 0 && (
+                      <li>
+                        <strong>Selected initiatives:</strong>{" "}
+                        {exp.projects.map((p, idx) => (
+                          <>
+                            {idx > 0 ? "; " : ""}
+                            <a href={p.url}>{p.title}</a> ({p.summary})
+                          </>
+                        ))}
+                      </li>
+                    )}
+                  </ul>
+                )}
+              </div>
+            ))
+          }
+        </div>
+      </section>
+
+      <section class="cv-section">
+        <h2>Education</h2>
+        <div class="entries compact">
+          {
+            profile.education.map((edu) => (
+              <div class="entry">
+                <div class="entry-head">
+                  <div>
+                    <strong>{edu.degree}</strong> — {edu.institution}
+                  </div>
+                  <span class="period">{edu.period}</span>
+                </div>
+                {edu.notes && <p class="entry-desc">{edu.notes}</p>}
+              </div>
+            ))
+          }
+        </div>
+      </section>
+
+      <section class="cv-section">
+        <h2>Publications &amp; Press</h2>
+        <ul class="bullets">
+          {
+            profile.publications.map((pub) => (
+              <li>
+                <strong>{pub.title}</strong> — {pub.venue}
+                {pub.year ? ` (${pub.year})` : ""}
+              </li>
+            ))
+          }
+          {
+            profile.press.map((item) => (
+              <li>
+                <strong>{item.title}</strong> — {item.outlet} ({item.date})
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+
+      <section class="cv-section grid-two">
+        <div>
+          <h2>Skills</h2>
+          <ul class="bullets">
+            {
+              profile.skills.map((group) => (
+                <li>
+                  <strong>{group.category}:</strong> {group.items.join(", ")}
+                </li>
+              ))
+            }
+          </ul>
+          <h2 class="mt">Languages</h2>
+          <ul class="bullets">
+            {profile.languages.map((lang) => <li>{lang}</li>)}
+          </ul>
+        </div>
+        <div>
+          <h2>Certifications</h2>
+          <ul class="bullets">
+            {profile.certifications.map((cert) => <li>{cert}</li>)}
+          </ul>
+          <h2 class="mt">Honors &amp; Awards</h2>
+          <ul class="bullets">
+            {profile.honors.map((honor) => <li>{honor}</li>)}
+          </ul>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
+
+<style>
+  @page {
+    size: A4;
+    margin: 13mm 15mm;
+  }
+
+  :root {
+    --ink: #0f172a;
+    --ink-muted: #475569;
+    --ink-subtle: #64748b;
+    --accent: #2563eb;
+    --line: #cbd5e1;
+    --paper: #ffffff;
+    --bg: #f1f5f9;
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Space Grotesk", -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 9.5pt;
+    line-height: 1.42;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  .toolbar {
+    max-width: 210mm;
+    margin: 18px auto 0;
+    padding: 0 4px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .toolbar-link {
+    font-size: 0.9rem;
+    color: var(--ink-muted);
+    font-weight: 500;
+  }
+
+  .toolbar-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .toolbar-btn {
+    font: inherit;
+    font-size: 0.85rem;
+    font-weight: 500;
+    padding: 7px 14px;
+    border-radius: 7px;
+    border: 1px solid var(--line);
+    background: var(--paper);
+    color: var(--ink);
+    cursor: pointer;
+  }
+
+  .toolbar-btn-primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  .sheet {
+    width: 210mm;
+    max-width: 100%;
+    margin: 14px auto 36px;
+    background: var(--paper);
+    padding: 15mm 16mm;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+    border-radius: 4px;
+  }
+
+  .cv-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--ink);
+    margin-bottom: 12px;
+  }
+
+  h1 {
+    font-family: "Archivo", sans-serif;
+    font-size: 21pt;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+
+  .headline {
+    font-size: 10.5pt;
+    font-weight: 600;
+    color: var(--accent);
+    margin-top: 2px;
+  }
+
+  .contact-list {
+    list-style: none;
+    text-align: right;
+    font-size: 8.5pt;
+    color: var(--ink-muted);
+    line-height: 1.48;
+  }
+
+  .contact-list a {
+    color: var(--ink-muted);
+  }
+
+  .cv-section {
+    margin-bottom: 11px;
+  }
+
+  .cv-section h2 {
+    font-family: "Archivo", sans-serif;
+    font-size: 9.5pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--accent);
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 2px;
+    margin-bottom: 6px;
+  }
+
+  .cv-section h2.mt {
+    margin-top: 8px;
+  }
+
+  .summary {
+    color: var(--ink);
+    font-size: 9.2pt;
+  }
+
+  .entries {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  .entries.compact {
+    gap: 5px;
+  }
+
+  .entry {
+    break-inside: avoid;
+  }
+
+  .entry-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+  }
+
+  .role {
+    color: var(--ink-muted);
+    font-weight: 500;
+  }
+
+  .period {
+    font-size: 8.2pt;
+    color: var(--ink-subtle);
+    white-space: nowrap;
+  }
+
+  .subroles {
+    margin-top: 2px;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  .subrole {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 8.8pt;
+  }
+
+  .entry-desc {
+    font-size: 8.8pt;
+    color: var(--ink-muted);
+    margin-top: 2px;
+  }
+
+  .bullets {
+    margin-top: 3px;
+    padding-left: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .bullets li {
+    font-size: 8.8pt;
+    color: var(--ink-muted);
+  }
+
+  .bullets li strong {
+    color: var(--ink);
+  }
+
+  .grid-two {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 18px;
+    break-inside: avoid;
+  }
+
+  @media print {
+    body {
+      background: #ffffff;
+    }
+
+    .no-print {
+      display: none !important;
+    }
+
+    .sheet {
+      width: auto;
+      margin: 0;
+      padding: 0;
+      box-shadow: none;
+      border-radius: 0;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .sheet {
+      padding: 20px;
+      margin: 10px auto 24px;
+    }
+
+    .cv-header,
+    .entry-head,
+    .grid-two {
+      flex-direction: column;
+      grid-template-columns: 1fr;
+    }
+
+    .contact-list {
+      text-align: left;
+    }
+  }
+</style>

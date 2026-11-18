@@ -1,0 +1,955 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import ContributionGraph from "../components/ContributionGraph.astro";
+import SocialIcons from "../components/SocialIcons.astro";
+import { loadProfile } from "../lib/profile";
+import { getGitHubContributions } from "../lib/github-contributions";
+
+const profile = loadProfile();
+const contributions = await getGitHubContributions(profile.githubUsername);
+const currentExperience = profile.experience.filter((exp) =>
+  /present/i.test(exp.period),
+);
+const currentYear = new Date().getFullYear();
+
+const summaryHtml = profile.summary
+  .replace(/&/g, "&amp;")
+  .replace(/</g, "&lt;")
+  .replace(/>/g, "&gt;")
+  .replace(
+    "LL Cloud (devop.sh)",
+    '<a class="inline-link" href="https://devop.sh/" target="_blank" rel="noopener">LL Cloud</a>',
+  )
+  .replace(
+    "LinkSentry (linksentry.io)",
+    '<a class="inline-link" href="https://linksentry.io/" target="_blank" rel="noopener">LinkSentry</a>',
+  )
+  .replace(
+    /\bGRNET\b/,
+    '<a class="inline-link" href="https://grnet.gr/en/" target="_blank" rel="noopener">GRNET</a>',
+  );
+
+const socials = [
+  {
+    label: "GitHub",
+    handle: `@${profile.githubUsername}`,
+    href: profile.github,
+    icon: "github" as const,
+  },
+  {
+    label: "LinkedIn",
+    handle: "spyrosligouras",
+    href: profile.linkedin,
+    icon: "linkedin" as const,
+  },
+  {
+    label: "X",
+    handle: `@${profile.githubUsername}`,
+    href: profile.x,
+    icon: "x" as const,
+  },
+];
+---
+
+<BaseLayout
+  title={`${profile.name} — ${profile.headline}`}
+  description={profile.summary}
+  url={profile.website}
+>
+  <header class="topbar" id="top">
+    <div class="topbar-inner">
+      <a class="brand" href="#top">
+        {profile.brand}<span class="accent">.</span>
+      </a>
+      <nav class="topnav" aria-label="Main">
+        <a class="nav-link nav-section" href="#ventures">Ventures</a>
+        <a class="nav-link nav-section" href="#activity">Activity</a>
+        <a class="nav-link nav-section" href="#experience">Experience</a>
+        <a class="nav-link" href="/cv/">CV</a>
+      </nav>
+      <div class="top-actions">
+        <a
+          class="icon-link"
+          href={profile.github}
+          aria-label="GitHub"
+          rel="me noopener"
+          target="_blank"
+        >
+          <SocialIcons icon="github" />
+        </a>
+        <a
+          class="nav-pill"
+          href="/cv.pdf"
+          download="Spyros-Ligouras-CV.pdf"
+        >
+          CV (PDF)
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <header class="hero">
+      <div class="eyebrow-row">
+        <span class="eyebrow">
+          <span class="dot" aria-hidden="true"></span>
+          {profile.headline}
+        </span>
+        <span class="location">{profile.location}</span>
+      </div>
+
+      <h1>
+        {profile.brand}<span class="accent">.</span>
+      </h1>
+
+      <p class="lead">
+        <strong class="lead-name">{profile.name}</strong>
+      </p>
+      <p class="bio" set:html={summaryHtml} />
+
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="/cv.pdf" download="Spyros-Ligouras-CV.pdf">
+          Download CV (PDF)
+        </a>
+        <a class="btn btn-secondary" href="/cv/">
+          View CV
+        </a>
+      </div>
+    </header>
+
+    <section id="ventures" class="anchored" aria-labelledby="ventures-heading">
+      <div class="section-head">
+        <h2 id="ventures-heading">Ventures</h2>
+      </div>
+      <div class="ventures-grid">
+        {
+          profile.ventures.map((v) => (
+            <article class="venture-card">
+              <div class="venture-top">
+                <div>
+                  <h3>
+                    <a href={v.url} target="_blank" rel="noopener">
+                      {v.name} <span aria-hidden="true">↗</span>
+                    </a>
+                  </h3>
+                  <p class="venture-role">
+                    {v.role} · {v.period}
+                  </p>
+                </div>
+              </div>
+              <p class="venture-summary">{v.summary}</p>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+
+    <div id="activity" class="anchored">
+      <ContributionGraph data={contributions} />
+    </div>
+
+    <section id="experience" class="anchored" aria-labelledby="experience-heading">
+      <div class="section-head">
+        <h2 id="experience-heading">Experience</h2>
+        <a class="section-link" href="/cv/">Full CV →</a>
+      </div>
+      <div class="timeline">
+        {
+          currentExperience.map((exp) => (
+            <article class="timeline-item">
+              <div class="timeline-meta">
+                <span class="timeline-period">{exp.period}</span>
+                <span class="timeline-location">{exp.location}</span>
+              </div>
+              <div class="timeline-body">
+                <h3>{exp.company}</h3>
+                {exp.subroles.length > 0 ? (
+                  <ul class="subroles">
+                    {exp.subroles.map((sr) => (
+                      <li>
+                        <span class="subrole-title">{sr.title}</span>
+                        <span class="subrole-period">{sr.period}</span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p class="timeline-role">{exp.role}</p>
+                )}
+                {exp.bullets.length > 0 && (
+                  <ul class="bullets">
+                    {exp.bullets.map((b) => (
+                      <li>{b}</li>
+                    ))}
+                  </ul>
+                )}
+                {exp.projects.length > 0 && (
+                  <div class="exp-projects">
+                    <span class="exp-projects-label">Recent projects</span>
+                    <ul class="exp-projects-list">
+                      {exp.projects.map((p) => (
+                        <li>
+                          <a href={p.url} target="_blank" rel="noopener">
+                            {p.title} <span aria-hidden="true">↗</span>
+                          </a>
+                          <span>{p.summary}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="two-col" aria-label="Research, Education and Press">
+      <div class="panel">
+        <h2>Publications &amp; Press</h2>
+        <ul class="ref-list">
+          {
+            profile.publications
+              .filter((pub) => /usenix/i.test(pub.venue))
+              .map((pub) => (
+              <li>
+                {pub.url ? (
+                  <a href={pub.url} target="_blank" rel="noopener">
+                    {pub.title} ↗
+                  </a>
+                ) : (
+                  <span>{pub.title}</span>
+                )}
+                <small>
+                  {pub.venue}
+                  {pub.year ? ` (${pub.year})` : ""}
+                </small>
+              </li>
+            ))
+          }
+          {
+            profile.press.map((item) => (
+              <li>
+                <a href={item.url} target="_blank" rel="noopener">
+                  {item.title} ↗
+                </a>
+                <small>
+                  {item.outlet} · {item.date}
+                </small>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <div class="panel">
+        <h2>Education &amp; Credentials</h2>
+        <ul class="ref-list">
+          {
+            profile.education.map((edu) => (
+              <li>
+                <span>{edu.degree}</span>
+                <small>
+                  {edu.institution} · {edu.period}
+                </small>
+              </li>
+            ))
+          }
+          {
+            profile.certifications.slice(0, 1).map((cert) => (
+              <li>
+                <span>{cert}</span>
+                <small>Certification</small>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </section>
+
+    <section aria-label="Social links">
+      <nav class="social-grid" aria-label="Social profiles">
+        {
+          socials.map((social) => (
+            <a
+              class="social-card"
+              href={social.href}
+              rel="me noopener"
+              target="_blank"
+            >
+              <span class="social-icon">
+                <SocialIcons icon={social.icon} />
+              </span>
+              <span class="social-meta">
+                <span class="social-label">{social.label}</span>
+                <span class="social-handle">{social.handle}</span>
+              </span>
+              <span class="social-arrow" aria-hidden="true">
+                ↗
+              </span>
+            </a>
+          ))
+        }
+      </nav>
+    </section>
+
+    <footer class="footer">
+      <span>&copy; {currentYear} {profile.name}</span>
+      <span class="footer-links">
+        <a href="/cv/">CV</a>
+        <span aria-hidden="true">·</span>
+        <a href="/cv.pdf" download="Spyros-Ligouras-CV.pdf">CV (PDF)</a>
+        <span aria-hidden="true">·</span>
+        <span>Activity synced {contributions.fetchedAt}</span>
+      </span>
+    </footer>
+  </main>
+</BaseLayout>
+
+<style>
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: rgba(9, 9, 11, 0.82);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .topbar-inner {
+    width: 100%;
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .brand {
+    font-family: "Archivo", system-ui, sans-serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+    letter-spacing: -0.02em;
+    color: var(--fg);
+  }
+
+  .brand .accent {
+    color: var(--accent);
+  }
+
+  .topnav {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .nav-link {
+    font-size: 0.86rem;
+    color: var(--muted);
+    transition: color 160ms ease;
+  }
+
+  .nav-link:hover {
+    color: var(--fg);
+  }
+
+  .top-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .icon-link {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 160ms ease, border-color 160ms ease;
+  }
+
+  .icon-link:hover {
+    color: var(--fg);
+    border-color: var(--accent);
+  }
+
+  .icon-link :global(svg) {
+    width: 16px;
+    height: 16px;
+  }
+
+  .nav-pill {
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--fg);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 5px 12px;
+    border-radius: 8px;
+    transition: border-color 160ms ease, background-color 160ms ease;
+    white-space: nowrap;
+  }
+
+  .nav-pill:hover {
+    border-color: var(--accent);
+    background: var(--surface-elevated);
+  }
+
+  .anchored {
+    scroll-margin-top: 72px;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 880px;
+    margin: 0 auto;
+    padding: clamp(32px, 6vw, 56px) 24px 56px;
+    display: flex;
+    flex-direction: column;
+    gap: 36px;
+  }
+
+  .hero {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .eyebrow-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 22px;
+  }
+
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.78rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    background: rgba(24, 24, 27, 0.6);
+    border-radius: 999px;
+    padding: 5px 13px;
+  }
+
+  .location {
+    font-size: 0.82rem;
+    color: var(--subtle);
+  }
+
+  .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 10px var(--accent);
+    animation: pulse 2.4s ease-in-out infinite;
+  }
+
+  h1 {
+    font-family: "Archivo", system-ui, sans-serif;
+    font-weight: 700;
+    font-size: clamp(2.6rem, 8vw, 4rem);
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+    margin-bottom: 14px;
+    text-shadow: 0 0 28px rgba(250, 250, 250, 0.1);
+  }
+
+  h1 .accent {
+    color: var(--accent);
+  }
+
+  .lead {
+    font-size: clamp(1.05rem, 2.6vw, 1.2rem);
+    color: var(--fg);
+    margin-bottom: 8px;
+  }
+
+  .lead-name {
+    font-weight: 500;
+  }
+
+  .bio {
+    font-size: 0.98rem;
+    color: var(--muted);
+    max-width: 64ch;
+    margin-bottom: 22px;
+  }
+
+  .bio :global(.inline-link) {
+    color: var(--fg);
+    text-decoration: underline;
+    text-decoration-color: rgba(37, 99, 235, 0.55);
+    text-underline-offset: 3px;
+    transition: color 160ms ease, text-decoration-color 160ms ease;
+  }
+
+  .bio :global(.inline-link:hover) {
+    color: var(--accent-hover);
+    text-decoration-color: var(--accent-hover);
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 9px 16px;
+    border-radius: 9px;
+    font-size: 0.88rem;
+    font-weight: 500;
+    border: 1px solid var(--border);
+    transition:
+      background-color 180ms ease,
+      border-color 180ms ease,
+      color 180ms ease,
+      transform 180ms ease;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  .btn-primary:hover {
+    background: var(--accent-hover);
+    border-color: var(--accent-hover);
+    transform: translateY(-1px);
+  }
+
+  .btn-secondary {
+    background: var(--surface);
+    color: var(--fg);
+  }
+
+  .btn-secondary:hover {
+    border-color: var(--accent);
+    background: var(--surface-elevated);
+    transform: translateY(-1px);
+  }
+
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .section-head h2,
+  .panel h2 {
+    font-family: "Archivo", system-ui, sans-serif;
+    font-size: 1.05rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--fg);
+  }
+
+  .section-link {
+    font-size: 0.85rem;
+    color: var(--muted);
+    transition: color 160ms ease;
+  }
+
+  .section-link:hover {
+    color: var(--accent-hover);
+  }
+
+  .ventures-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .venture-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .venture-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .venture-card h3 {
+    font-family: "Archivo", system-ui, sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  .venture-card h3 a:hover {
+    color: var(--accent-hover);
+  }
+
+  .venture-role {
+    font-size: 0.82rem;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .venture-summary {
+    font-size: 0.88rem;
+    color: var(--muted);
+    line-height: 1.55;
+  }
+
+  .timeline {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    overflow: hidden;
+  }
+
+  .timeline-item {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 20px;
+    padding: 18px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .timeline-item:last-child {
+    border-bottom: none;
+  }
+
+  .timeline-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .timeline-period {
+    font-size: 0.82rem;
+    color: var(--fg);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .timeline-location {
+    font-size: 0.78rem;
+    color: var(--subtle);
+  }
+
+  .timeline-body h3 {
+    font-family: "Archivo", system-ui, sans-serif;
+    font-size: 0.96rem;
+    font-weight: 600;
+    color: var(--fg);
+  }
+
+  .timeline-role {
+    font-size: 0.86rem;
+    color: var(--accent-hover);
+    margin-top: 2px;
+  }
+
+  .subroles {
+    list-style: none;
+    margin-top: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .subroles li {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    font-size: 0.85rem;
+  }
+
+  .subrole-title {
+    color: var(--accent-hover);
+  }
+
+  .subrole-period {
+    color: var(--subtle);
+    font-size: 0.78rem;
+  }
+
+  .bullets {
+    margin-top: 8px;
+    padding-left: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .bullets li {
+    font-size: 0.86rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  .exp-projects {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--border);
+  }
+
+  .exp-projects-label {
+    display: block;
+    font-size: 0.74rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--subtle);
+    margin-bottom: 6px;
+  }
+
+  .exp-projects-list {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .exp-projects-list li {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 9px 11px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+
+  .exp-projects-list a {
+    font-size: 0.84rem;
+    font-weight: 500;
+    color: var(--fg);
+    transition: color 160ms ease;
+  }
+
+  .exp-projects-list a:hover {
+    color: var(--accent-hover);
+  }
+
+  .exp-projects-list span {
+    font-size: 0.77rem;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+  }
+
+  .panel h2 {
+    margin-bottom: 14px;
+  }
+
+  .ref-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .ref-list li {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: 0.88rem;
+  }
+
+  .ref-list a {
+    color: var(--fg);
+    transition: color 160ms ease;
+  }
+
+  .ref-list a:hover {
+    color: var(--accent-hover);
+  }
+
+  .ref-list small {
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+
+  .social-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .social-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 13px 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    transition:
+      border-color 180ms ease,
+      background-color 180ms ease,
+      transform 180ms ease;
+  }
+
+  .social-card:hover {
+    border-color: var(--accent);
+    background: #161822;
+    transform: translateY(-2px);
+  }
+
+  .social-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    background: var(--surface-elevated);
+    border: 1px solid var(--border);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted);
+    flex-shrink: 0;
+    transition: color 180ms ease;
+  }
+
+  .social-card:hover .social-icon {
+    color: var(--fg);
+  }
+
+  .social-icon :global(svg) {
+    width: 17px;
+    height: 17px;
+  }
+
+  .social-meta {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .social-label {
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--fg);
+    line-height: 1.25;
+  }
+
+  .social-handle {
+    font-size: 0.76rem;
+    color: var(--muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .social-arrow {
+    margin-left: auto;
+    color: var(--subtle);
+    font-size: 0.88rem;
+    transition: color 180ms ease, transform 180ms ease;
+  }
+
+  .social-card:hover .social-arrow {
+    color: var(--accent-hover);
+    transform: translate(1px, -1px);
+  }
+
+  .footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+    font-size: 0.82rem;
+    color: var(--subtle);
+    flex-wrap: wrap;
+  }
+
+  .footer-links {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .footer-links a:hover {
+    color: var(--fg);
+  }
+
+  @keyframes pulse {
+    0%,
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.4;
+      transform: scale(0.85);
+    }
+  }
+
+  @media (max-width: 760px) {
+    .ventures-grid,
+    .two-col,
+    .social-grid,
+    .exp-projects-list {
+      grid-template-columns: 1fr;
+    }
+
+    .timeline-item {
+      grid-template-columns: 1fr;
+      gap: 6px;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .nav-section {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .dot {
+      animation: none;
+    }
+    .btn,
+    .social-card,
+    .social-icon,
+    .social-arrow {
+      transition: none;
+    }
+  }
+</style>

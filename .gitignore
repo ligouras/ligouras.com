@@ -16,3 +16,8 @@
 # Book source files
 *.pdf
 *.epub
+
+# Astro build & dependencies
+node_modules/
+dist/
+.astro/

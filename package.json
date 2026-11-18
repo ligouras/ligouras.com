@@ -1,0 +1,16 @@
+{
+  "name": "ligouras.com",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "ASTRO_TELEMETRY_DISABLED=1 astro dev",
+    "build": "ASTRO_TELEMETRY_DISABLED=1 astro build && node scripts/copy-static.mjs && node scripts/generate-cv.mjs",
+    "cv": "node scripts/generate-cv.mjs --sync-public",
+    "preview": "ASTRO_TELEMETRY_DISABLED=1 astro preview",
+    "astro": "ASTRO_TELEMETRY_DISABLED=1 astro"
+  },
+  "dependencies": {
+    "astro": "^7.4.13"
+  }
+}

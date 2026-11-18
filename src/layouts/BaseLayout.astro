@@ -1,0 +1,103 @@
+---
+interface Props {
+  title: string;
+  description: string;
+  url: string;
+}
+
+const { title, description, url } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={url} />
+
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>L</text></svg>"
+    />
+
+    <!-- Fonts: Archivo (headings) + Space Grotesk (body) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Space+Grotesk:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    --bg: #09090b;
+    --surface: #111114;
+    --surface-elevated: #18181b;
+    --fg: #fafafa;
+    --muted: #a1a1aa;
+    --subtle: #71717a;
+    --border: #27272a;
+    --accent: #2563eb;
+    --accent-hover: #3b82f6;
+    --accent-glow: rgba(37, 99, 235, 0.16);
+    --radius: 12px;
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    color-scheme: dark;
+    background-color: var(--bg);
+    scroll-behavior: smooth;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
+  body {
+    min-height: 100dvh;
+    background-color: var(--bg);
+    background-image: radial-gradient(
+      65% 50% at 50% 0%,
+      var(--accent-glow) 0%,
+      transparent 70%
+    );
+    background-repeat: no-repeat;
+    color: var(--fg);
+    font-family: "Space Grotesk", system-ui, -apple-system, sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  a:focus-visible,
+  button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+</style>
