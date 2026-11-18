@@ -2,8 +2,10 @@
 name: Spyros Ligouras
 fullName: Spyridon Antonios Ligouras
 brand: ligouras
+title: Senior Cloud & Software Engineer
 headline: DevOps | CloudOps | SecOps
-location: Athens Metropolitan Area, Greece
+location: Athens, Greece
+email: spyros@ligouras.com
 website: https://ligouras.com
 github: https://github.com/ligouras
 githubUsername: ligouras

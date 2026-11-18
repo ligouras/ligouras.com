@@ -8,32 +8,17 @@ interface Props {
 const { data } = Astro.props;
 const weekCount = data.weeks.length;
 
-function formatDayLabel(dateStr: string, count: number): string {
-  const date = new Date(`${dateStr}T00:00:00Z`);
-  const formatted = date.toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-    timeZone: "UTC",
-  });
-  if (count === 0) return `No contributions on ${formatted}`;
-  if (count === 1) return `1 contribution on ${formatted}`;
-  return `${count.toLocaleString("en-US")} contributions on ${formatted}`;
-}
+// The heatmap is display-only: one text alternative for the whole picture,
+// no per-day focus stops (the stats row above carries the numbers).
+const heatmapLabel =
+  data.source === "fallback"
+    ? "GitHub contribution heatmap (unavailable)"
+    : `GitHub contribution heatmap: ${data.totalContributions.toLocaleString("en-US")} contributions in the last year`;
 ---
 
 <section class="activity-card" aria-labelledby="activity-heading">
   <div class="activity-header">
-    <div>
-      <h2 id="activity-heading">GitHub Activity</h2>
-      <p class="activity-subtitle">
-        {
-          data.source === "fallback"
-            ? "Activity feed unavailable offline"
-            : `${data.totalContributions.toLocaleString("en-US")} contributions in the last year`
-        }
-      </p>
-    </div>
+    <h2 id="activity-heading">GitHub Activity</h2>
     <a
       class="profile-link"
       href={`https://github.com/${data.username}`}
@@ -44,29 +29,17 @@ function formatDayLabel(dateStr: string, count: number): string {
       <span aria-hidden="true">↗</span>
     </a>
   </div>
+  <p class="activity-subtitle">
+    {
+      data.source === "fallback"
+        ? "Activity feed unavailable offline"
+        : `${data.totalContributions.toLocaleString("en-US")} contributions in the last year`
+    }
+  </p>
 
-  <div class="stats-row">
-    <div class="stat">
-      <span class="stat-value">{data.totalContributions.toLocaleString("en-US")}</span>
-      <span class="stat-label">Contributions</span>
-    </div>
-    <div class="stat">
-      <span class="stat-value">{data.activeDays}</span>
-      <span class="stat-label">Active days</span>
-    </div>
-    <div class="stat">
-      <span class="stat-value">{data.currentStreak}d</span>
-      <span class="stat-label">Current streak</span>
-    </div>
-    <div class="stat">
-      <span class="stat-value">{data.longestStreak}d</span>
-      <span class="stat-label">Longest streak</span>
-    </div>
-  </div>
-
-  <div class="graph-scroll" tabindex="0" aria-label="GitHub contribution heatmap">
+  <div class="graph-scroll" role="img" aria-label={heatmapLabel}>
     <div class="graph-inner" style={`--weeks: ${weekCount};`}>
-      <div class="months-row" aria-hidden="true">
+      <div class="months-row">
         <div class="day-spacer"></div>
         <div class="months-track">
           {
@@ -80,7 +53,7 @@ function formatDayLabel(dateStr: string, count: number): string {
       </div>
 
       <div class="grid-body">
-        <div class="day-labels" aria-hidden="true">
+        <div class="day-labels">
           <span></span>
           <span>Mon</span>
           <span></span>
@@ -90,22 +63,15 @@ function formatDayLabel(dateStr: string, count: number): string {
           <span></span>
         </div>
 
-        <div class="weeks-grid" role="grid" aria-label="Daily contributions over the past year">
+        <div class="weeks-grid">
           {
             data.weeks.map((week) => (
-              <div class="week-col" role="row">
+              <div class="week-col">
                 {week.days.map((day) =>
                   day ? (
-                    <span
-                      class="cell"
-                      role="gridcell"
-                      tabindex="0"
-                      data-level={day.level}
-                      data-tip={formatDayLabel(day.date, day.count)}
-                      aria-label={formatDayLabel(day.date, day.count)}
-                    />
+                    <span class="cell" data-level={day.level} />
                   ) : (
-                    <span class="cell empty" aria-hidden="true" />
+                    <span class="cell empty" />
                   ),
                 )}
               </div>
@@ -117,9 +83,6 @@ function formatDayLabel(dateStr: string, count: number): string {
   </div>
 
   <div class="graph-footer">
-    <p class="inspect-readout" id="contrib-readout" aria-live="polite">
-      Hover or focus a day to inspect
-    </p>
     <div class="legend" aria-hidden="true">
       <span>Less</span>
       <span class="cell" data-level="0"></span>
@@ -132,33 +95,6 @@ function formatDayLabel(dateStr: string, count: number): string {
   </div>
 </section>
 
-<script>
-  const readout = document.getElementById("contrib-readout");
-  const defaultMsg = "Hover or focus a day to inspect";
-  const grid = document.querySelector(".weeks-grid");
-
-  if (readout && grid) {
-    const showTip = (target: EventTarget | null) => {
-      if (!(target instanceof HTMLElement)) return;
-      const tip = target.dataset.tip;
-      if (tip) readout.textContent = tip;
-    };
-
-    const resetTip = () => {
-      readout.textContent = defaultMsg;
-    };
-
-    grid.addEventListener("pointerover", (e) => showTip(e.target));
-    grid.addEventListener("focusin", (e) => showTip(e.target));
-    grid.addEventListener("pointerleave", resetTip);
-    grid.addEventListener("focusout", (e) => {
-      if (!grid.contains(e.relatedTarget as Node | null)) {
-        resetTip();
-      }
-    });
-  }
-</script>
-
 <style>
   .activity-card {
     background: var(--surface);
@@ -169,10 +105,9 @@ function formatDayLabel(dateStr: string, count: number): string {
 
   .activity-header {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: space-between;
     gap: 16px;
-    margin-bottom: 20px;
   }
 
   h2 {
@@ -184,7 +119,7 @@ function formatDayLabel(dateStr: string, count: number): string {
   }
 
   .activity-subtitle {
-    margin-top: 2px;
+    margin: 2px 0 20px;
     font-size: 0.9rem;
     color: var(--muted);
   }
@@ -208,38 +143,10 @@ function formatDayLabel(dateStr: string, count: number): string {
     border-color: var(--accent);
   }
 
-  .stats-row {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 12px;
-    margin-bottom: 20px;
-  }
-
-  .stat {
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 12px 14px;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-  }
-
-  .stat-value {
-    font-family: "Archivo", system-ui, sans-serif;
-    font-size: 1.25rem;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    font-variant-numeric: tabular-nums;
-    color: var(--fg);
-  }
-
-  .stat-label {
-    font-size: 0.78rem;
-    color: var(--muted);
-  }
-
+  /* rtl on the scroller makes narrow screens open on the most recent weeks;
+     the content itself is flipped back to ltr. */
   .graph-scroll {
+    direction: rtl;
     overflow-x: auto;
     padding-bottom: 6px;
     scrollbar-color: var(--border) transparent;
@@ -247,7 +154,9 @@ function formatDayLabel(dateStr: string, count: number): string {
   }
 
   .graph-inner {
+    direction: ltr;
     width: max-content;
+    margin-right: auto; /* left-aligned when it fits */
   }
 
   .months-row {
@@ -266,7 +175,7 @@ function formatDayLabel(dateStr: string, count: number): string {
     display: grid;
     grid-template-columns: repeat(var(--weeks), 11px);
     gap: 3px;
-    font-size: 0.72rem;
+    font-size: 0.75rem;
     line-height: 1.1;
     color: var(--subtle);
   }
@@ -311,12 +220,10 @@ function formatDayLabel(dateStr: string, count: number): string {
     height: 11px;
     border-radius: 2.5px;
     display: block;
-    transition: transform 100ms ease, outline-color 100ms ease;
   }
 
   .cell.empty {
     background: transparent;
-    pointer-events: none;
   }
 
   .cell[data-level="0"] {
@@ -341,28 +248,10 @@ function formatDayLabel(dateStr: string, count: number): string {
     box-shadow: 0 0 6px rgba(96, 165, 250, 0.35);
   }
 
-  .weeks-grid .cell:not(.empty):hover,
-  .weeks-grid .cell:not(.empty):focus-visible {
-    transform: scale(1.25);
-    outline: 1.5px solid var(--fg);
-    outline-offset: 1px;
-    position: relative;
-    z-index: 2;
-  }
-
   .graph-footer {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
+    justify-content: flex-end;
     margin-top: 12px;
-    flex-wrap: wrap;
-  }
-
-  .inspect-readout {
-    font-size: 0.8rem;
-    color: var(--muted);
-    min-height: 1.2em;
   }
 
   .legend {
@@ -385,14 +274,9 @@ function formatDayLabel(dateStr: string, count: number): string {
     .activity-card {
       padding: 18px;
     }
-
-    .stats-row {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .cell,
     .profile-link {
       transition: none;
     }

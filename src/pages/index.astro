@@ -1,5 +1,7 @@
 ---
+import { Image } from "astro:assets";
 import BaseLayout from "../layouts/BaseLayout.astro";
+import portrait from "../assets/portrait.webp";
 import ContributionGraph from "../components/ContributionGraph.astro";
 import SocialIcons from "../components/SocialIcons.astro";
 import { loadProfile } from "../lib/profile";
@@ -7,9 +9,26 @@ import { getGitHubContributions } from "../lib/github-contributions";
 
 const profile = loadProfile();
 const contributions = await getGitHubContributions(profile.githubUsername);
-const currentExperience = profile.experience.filter((exp) =>
-  /present/i.test(exp.period),
-);
+// Ventures already have their own cards, so the homepage timeline skips any
+// current role whose company names a venture's domain (the CV keeps them all).
+const ventureHosts = profile.ventures
+  .map((v) => (v.url ? new URL(v.url).hostname.replace(/^www\./, "") : ""))
+  .filter(Boolean);
+// Projects that stay on the CV but are too granular for the homepage.
+const homepageHiddenProjects = new Set([
+  "https://grnet.gr/business-directory/webuild/",
+  "https://github.com/webuild-consortium/webuild-github-policies",
+]);
+const currentExperience = profile.experience
+  .filter(
+    (exp) =>
+      /present/i.test(exp.period) &&
+      !ventureHosts.some((host) => exp.company.includes(host)),
+  )
+  .map((exp) => ({
+    ...exp,
+    projects: exp.projects.filter((p) => !homepageHiddenProjects.has(p.url)),
+  }));
 const currentYear = new Date().getFullYear();
 
 const summaryHtml = profile.summary
@@ -28,6 +47,26 @@ const summaryHtml = profile.summary
     /\bGRNET\b/,
     '<a class="inline-link" href="https://grnet.gr/en/" target="_blank" rel="noopener">GRNET</a>',
   );
+
+// Homepage shows "City, Country"; the CV keeps the full location string.
+const city = profile.location.replace(/\s+Metropolitan Area/i, "").trim();
+
+// Lucide-style 24px stroke icons for the focus-area chips.
+const focusIcons: Record<string, string> = {
+  devops:
+    '<path d="M12 12c-2-2.67-4-4-6-4a4 4 0 1 0 0 8c2 0 4-1.33 6-4Zm0 0c2 2.67 4 4 6 4a4 4 0 0 0 0-8c-2 0-4 1.33-6 4Z"/>',
+  cloudops: '<path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>',
+  secops:
+    '<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/>',
+};
+const pinIcon =
+  '<path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/>';
+
+const focusAreas = profile.headline
+  .split("|")
+  .map((label) => label.trim())
+  .filter(Boolean)
+  .map((label) => ({ label, icon: focusIcons[label.toLowerCase()] }));
 
 const socials = [
   {
@@ -56,15 +95,17 @@ const socials = [
   description={profile.summary}
   url={profile.website}
 >
+  <a class="skip-link" href="#main">Skip to content</a>
+
   <header class="topbar" id="top">
     <div class="topbar-inner">
       <a class="brand" href="#top">
         {profile.brand}<span class="accent">.</span>
       </a>
       <nav class="topnav" aria-label="Main">
-        <a class="nav-link nav-section" href="#ventures">Ventures</a>
-        <a class="nav-link nav-section" href="#activity">Activity</a>
-        <a class="nav-link nav-section" href="#experience">Experience</a>
+        <a class="nav-link" href="#ventures">Ventures</a>
+        <a class="nav-link" href="#experience">Experience</a>
+        <a class="nav-link" href="#activity">Activity</a>
         <a class="nav-link" href="/cv/">CV</a>
       </nav>
       <div class="top-actions">
@@ -88,36 +129,81 @@ const socials = [
     </div>
   </header>
 
-  <main class="container">
+  <main class="container" id="main" tabindex="-1">
     <header class="hero">
-      <div class="eyebrow-row">
-        <span class="eyebrow">
-          <span class="dot" aria-hidden="true"></span>
-          {profile.headline}
-        </span>
-        <span class="location">{profile.location}</span>
+      <div class="hero-portrait">
+        <Image
+          src={portrait}
+          alt={`Portrait of ${profile.name}`}
+          width={200}
+          height={200}
+          widths={[72, 144, 200, 216, 400, 600]}
+          sizes="(max-width: 600px) 72px, 200px"
+          format="webp"
+          quality={92}
+          loading="eager"
+          decoding="async"
+          fetchpriority="high"
+        />
       </div>
 
-      <h1>
-        {profile.brand}<span class="accent">.</span>
-      </h1>
+      <div class="hero-text">
+        <p class="wordmark" aria-hidden="true">
+          {profile.brand}<span class="accent">.</span>
+        </p>
 
-      <p class="lead">
-        <strong class="lead-name">{profile.name}</strong>
-      </p>
-      <p class="bio" set:html={summaryHtml} />
+        <div class="lead">
+          <h1 class="lead-name">{profile.name}</h1>
+          <span class="lead-location">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+              set:html={pinIcon}
+            />
+            {city}
+          </span>
+        </div>
 
-      <div class="hero-actions">
-        <a class="btn btn-primary" href="/cv.pdf" download="Spyros-Ligouras-CV.pdf">
-          Download CV (PDF)
-        </a>
-        <a class="btn btn-secondary" href="/cv/">
-          View CV
-        </a>
+        <ul class="focus-list" aria-label="Focus areas">
+          {
+            focusAreas.map((area) => (
+              <li class="focus-chip">
+                {area.icon && (
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                    set:html={area.icon}
+                  />
+                )}
+                {area.label}
+              </li>
+            ))
+          }
+        </ul>
+        <p class="bio" set:html={summaryHtml} />
+
+        <div class="hero-actions">
+          <a class="btn btn-primary" href={`mailto:${profile.email}`}>
+            Get in touch
+          </a>
+          <a class="btn btn-secondary" href="/cv.pdf" download="Spyros-Ligouras-CV.pdf">
+            Download CV (PDF)
+          </a>
+        </div>
       </div>
     </header>
 
-    <section id="ventures" class="anchored" aria-labelledby="ventures-heading">
+    <section id="ventures" aria-labelledby="ventures-heading">
       <div class="section-head">
         <h2 id="ventures-heading">Ventures</h2>
       </div>
@@ -144,11 +230,7 @@ const socials = [
       </div>
     </section>
 
-    <div id="activity" class="anchored">
-      <ContributionGraph data={contributions} />
-    </div>
-
-    <section id="experience" class="anchored" aria-labelledby="experience-heading">
+    <section id="experience" aria-labelledby="experience-heading">
       <div class="section-head">
         <h2 id="experience-heading">Experience</h2>
         <a class="section-link" href="/cv/">Full CV →</a>
@@ -203,6 +285,10 @@ const socials = [
         }
       </div>
     </section>
+
+    <div id="activity">
+      <ContributionGraph data={contributions} />
+    </div>
 
     <section class="two-col" aria-label="Research, Education and Press">
       <div class="panel">
@@ -296,11 +382,9 @@ const socials = [
     <footer class="footer">
       <span>&copy; {currentYear} {profile.name}</span>
       <span class="footer-links">
+        <a href={`mailto:${profile.email}`}>{profile.email}</a>
+        <span aria-hidden="true">·</span>
         <a href="/cv/">CV</a>
-        <span aria-hidden="true">·</span>
-        <a href="/cv.pdf" download="Spyros-Ligouras-CV.pdf">CV (PDF)</a>
-        <span aria-hidden="true">·</span>
-        <span>Activity synced {contributions.fetchedAt}</span>
       </span>
     </footer>
   </main>
@@ -337,7 +421,7 @@ const socials = [
   }
 
   .brand .accent {
-    color: var(--accent);
+    color: var(--accent-hover);
   }
 
   .topnav {
@@ -402,8 +486,31 @@ const socials = [
     background: var(--surface-elevated);
   }
 
-  .anchored {
-    scroll-margin-top: 72px;
+  /* Keep anchor jumps and keyboard-focused elements clear of the sticky bar. */
+  :global(html) {
+    scroll-padding-top: 72px;
+  }
+
+  .skip-link {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    z-index: 30;
+    padding: 8px 14px;
+    border-radius: 8px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 0.88rem;
+    font-weight: 500;
+    transform: translateY(-150%);
+  }
+
+  .skip-link:focus-visible {
+    transform: none;
+  }
+
+  main:focus {
+    outline: none;
   }
 
   .container {
@@ -417,48 +524,43 @@ const socials = [
   }
 
   .hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: "text portrait";
+    align-items: start;
+    gap: 32px;
+  }
+
+  .hero-text {
+    grid-area: text;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+    min-width: 0;
   }
 
-  .eyebrow-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-    margin-bottom: 22px;
-  }
-
-  .eyebrow {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.78rem;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--muted);
-    border: 1px solid var(--border);
-    background: rgba(24, 24, 27, 0.6);
-    border-radius: 999px;
-    padding: 5px 13px;
-  }
-
-  .location {
-    font-size: 0.82rem;
-    color: var(--subtle);
-  }
-
-  .dot {
-    width: 7px;
-    height: 7px;
+  .hero-portrait {
+    grid-area: portrait;
+    margin-top: 6px;
     border-radius: 50%;
-    background: var(--accent);
-    box-shadow: 0 0 10px var(--accent);
-    animation: pulse 2.4s ease-in-out infinite;
+    padding: 4px;
+    background:
+      linear-gradient(var(--bg), var(--bg)) padding-box,
+      linear-gradient(145deg, var(--accent-hover), var(--border) 55%) border-box;
+    border: 1px solid transparent;
+    box-shadow: 0 0 40px var(--accent-glow);
   }
 
-  h1 {
+  .hero-portrait :global(img) {
+    display: block;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: var(--surface-elevated);
+  }
+
+  .wordmark {
     font-family: "Archivo", system-ui, sans-serif;
     font-weight: 700;
     font-size: clamp(2.6rem, 8vw, 4rem);
@@ -468,18 +570,70 @@ const socials = [
     text-shadow: 0 0 28px rgba(250, 250, 250, 0.1);
   }
 
-  h1 .accent {
+  .wordmark .accent {
     color: var(--accent);
   }
 
   .lead {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    column-gap: 14px;
+    row-gap: 2px;
     font-size: clamp(1.05rem, 2.6vw, 1.2rem);
     color: var(--fg);
-    margin-bottom: 8px;
+    margin-bottom: 16px;
   }
 
   .lead-name {
+    font: inherit;
     font-weight: 500;
+    line-height: 1.6;
+  }
+
+  .lead-location {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.86rem;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .lead-location svg {
+    width: 14px;
+    height: 14px;
+    color: var(--subtle);
+    flex-shrink: 0;
+  }
+
+  .focus-list {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .focus-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 11px 5px 9px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    line-height: 1.3;
+    color: var(--fg);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+
+  .focus-chip svg {
+    width: 15px;
+    height: 15px;
+    color: var(--accent-hover);
+    flex-shrink: 0;
   }
 
   .bio {
@@ -653,7 +807,7 @@ const socials = [
   }
 
   .timeline-location {
-    font-size: 0.78rem;
+    font-size: 0.8125rem;
     color: var(--subtle);
   }
 
@@ -666,7 +820,8 @@ const socials = [
 
   .timeline-role {
     font-size: 0.86rem;
-    color: var(--accent-hover);
+    font-weight: 500;
+    color: var(--fg-secondary);
     margin-top: 2px;
   }
 
@@ -688,12 +843,13 @@ const socials = [
   }
 
   .subrole-title {
-    color: var(--accent-hover);
+    font-weight: 500;
+    color: var(--fg-secondary);
   }
 
   .subrole-period {
     color: var(--subtle);
-    font-size: 0.78rem;
+    font-size: 0.8125rem;
   }
 
   .bullets {
@@ -718,7 +874,8 @@ const socials = [
 
   .exp-projects-label {
     display: block;
-    font-size: 0.74rem;
+    font-size: 0.75rem;
+    font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.06em;
     color: var(--subtle);
@@ -742,6 +899,11 @@ const socials = [
     border-radius: 8px;
   }
 
+  /* An odd card out spans the full row instead of leaving a gap. */
+  .exp-projects-list li:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+
   .exp-projects-list a {
     font-size: 0.84rem;
     font-weight: 500;
@@ -754,7 +916,7 @@ const socials = [
   }
 
   .exp-projects-list span {
-    font-size: 0.77rem;
+    font-size: 0.8125rem;
     color: var(--muted);
     line-height: 1.4;
   }
@@ -800,7 +962,7 @@ const socials = [
   }
 
   .ref-list small {
-    font-size: 0.78rem;
+    font-size: 0.8125rem;
     color: var(--muted);
   }
 
@@ -867,7 +1029,7 @@ const socials = [
   }
 
   .social-handle {
-    font-size: 0.76rem;
+    font-size: 0.8125rem;
     color: var(--muted);
     overflow: hidden;
     text-overflow: ellipsis;
@@ -909,18 +1071,6 @@ const socials = [
     color: var(--fg);
   }
 
-  @keyframes pulse {
-    0%,
-    100% {
-      opacity: 1;
-      transform: scale(1);
-    }
-    50% {
-      opacity: 0.4;
-      transform: scale(0.85);
-    }
-  }
-
   @media (max-width: 760px) {
     .ventures-grid,
     .two-col,
@@ -936,15 +1086,161 @@ const socials = [
   }
 
   @media (max-width: 600px) {
-    .nav-section {
+    /* Two-row header: brand + actions, then a full-width link strip. */
+    .topbar-inner {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      grid-template-areas:
+        "brand actions"
+        "nav   nav";
+      row-gap: 0;
+      padding: 10px 24px 0;
+    }
+
+    .brand {
+      grid-area: brand;
+      justify-self: start;
+      align-self: center;
+    }
+
+    .top-actions {
+      grid-area: actions;
+      gap: 8px;
+    }
+
+    .icon-link {
+      width: 36px;
+      height: 36px;
+    }
+
+    .nav-pill {
+      padding: 8px 12px;
+    }
+
+    .topnav {
+      grid-area: nav;
+      justify-content: space-between;
+      gap: 4px;
+      margin: 10px -24px 0;
+      padding: 0 16px;
+      border-top: 1px solid var(--border);
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .topnav::-webkit-scrollbar {
+      display: none;
+    }
+
+    .nav-link {
+      display: inline-flex;
+      align-items: center;
+      min-height: 40px;
+      padding: 0 8px;
+      white-space: nowrap;
+    }
+
+    :global(html) {
+      scroll-padding-top: 116px;
+    }
+
+    /* Compact hero: portrait sits beside the wordmark + name. */
+    .hero {
+      grid-template-columns: auto minmax(0, 1fr);
+      grid-template-areas:
+        "portrait title"
+        "portrait name"
+        "focus    focus"
+        "bio      bio"
+        "actions  actions";
+      column-gap: 16px;
+      row-gap: 0;
+    }
+
+    .hero-text {
+      display: contents;
+    }
+
+    .wordmark {
+      grid-area: title;
+      align-self: end;
+      margin-bottom: 4px;
+    }
+
+    .lead {
+      grid-area: name;
+      align-self: start;
+      margin-bottom: 0;
+    }
+
+    /* Focus areas collapse into one segmented pill so they never wrap
+       into a lone chip on a second row. */
+    .focus-list {
+      grid-area: focus;
+      justify-self: start;
+      margin: 20px 0 16px;
+      gap: 0; /* still wraps (inside the pill) with very large text sizes */
+      max-width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+
+    .focus-chip {
+      gap: 6px;
+      padding: 6px 11px 6px 10px;
+      background: none;
+      border: none;
+      border-radius: 0;
+      white-space: nowrap;
+    }
+
+    .focus-chip + .focus-chip {
+      border-left: 1px solid var(--border);
+    }
+
+    .focus-chip svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .bio {
+      grid-area: bio;
+    }
+
+    .hero-actions {
+      grid-area: actions;
+    }
+
+    .hero-portrait {
+      align-self: center;
+      margin-top: 0;
+      padding: 3px;
+      box-shadow: 0 0 24px var(--accent-glow);
+    }
+
+    .hero-portrait :global(img) {
+      width: 72px;
+      height: 72px;
+    }
+  }
+
+  @media (max-width: 359px) {
+    /* Two buttons don't fit side by side: stack them full-width on purpose. */
+    .hero-actions .btn {
+      flex: 1 1 100%;
+    }
+
+    .focus-chip {
+      padding: 6px 12px;
+    }
+
+    .focus-chip svg {
       display: none;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .dot {
-      animation: none;
-    }
     .btn,
     .social-card,
     .social-icon,

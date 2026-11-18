@@ -57,8 +57,12 @@ export interface Profile {
   name: string;
   fullName: string;
   brand: string;
+  /** Job title, e.g. "Senior Cloud & Software Engineer". */
+  title: string;
+  /** Focus areas separated by "|", e.g. "DevOps | CloudOps | SecOps". */
   headline: string;
   location: string;
+  email: string;
   website: string;
   github: string;
   githubUsername: string;
@@ -280,8 +284,10 @@ export function loadProfile(): Profile {
     name: meta.name ?? "",
     fullName: meta.fullName ?? meta.name ?? "",
     brand: meta.brand ?? "ligouras",
+    title: meta.title ?? "",
     headline: meta.headline ?? "",
     location: meta.location ?? "",
+    email: meta.email ?? "",
     website: meta.website ?? "",
     github: meta.github ?? "",
     githubUsername: meta.githubUsername ?? "",

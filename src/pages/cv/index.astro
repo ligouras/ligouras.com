@@ -1,7 +1,36 @@
 ---
+// Static font weights (not variable fonts) so Chrome embeds real TrueType
+// fonts in the PDF instead of Type 3 glyphs, which some ATS parsers mangle.
+import "@fontsource/archivo/700.css";
+import "@fontsource/space-grotesk/400.css";
+import "@fontsource/space-grotesk/500.css";
+import "@fontsource/space-grotesk/600.css";
 import { loadProfile } from "../../lib/profile";
 
 const profile = loadProfile();
+
+const focusAreas = profile.headline
+  .split("|")
+  .map((s) => s.trim())
+  .filter(Boolean);
+
+const pageTitle = `${profile.name} — Curriculum Vitae`;
+const description = `Curriculum Vitae of ${profile.name}, ${profile.title} (${focusAreas.join(", ")}).`;
+const pageUrl = new URL("/cv/", Astro.site ?? profile.website).href;
+const ogImage = new URL("/og.jpg", Astro.site ?? profile.website).href;
+
+const prettyUrl = (url: string) =>
+  url.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "");
+
+// One row per role: the sub-roles when a company lists them, otherwise the
+// single role with the company's overall period.
+const experience = profile.experience.map((exp) => ({
+  ...exp,
+  roles:
+    exp.subroles.length > 0
+      ? exp.subroles
+      : [{ title: exp.role, period: exp.period }],
+}));
 ---
 
 <!doctype html>
@@ -9,144 +38,118 @@ const profile = loadProfile();
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{profile.name} — Curriculum Vitae</title>
-    <meta name="description" content={`Curriculum Vitae of ${profile.name} (${profile.headline})`} />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <meta name="author" content={profile.name} />
+    <link rel="canonical" href={pageUrl} />
+
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="profile" />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+
     <link
       rel="icon"
       href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>L</text></svg>"
     />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700&family=Space+Grotesk:wght@400;500;600&display=swap"
-      rel="stylesheet"
-    />
   </head>
   <body>
-    <div class="toolbar no-print">
+    <nav class="toolbar no-print" aria-label="CV actions">
       <a class="toolbar-link" href="/">← ligouras.com</a>
       <div class="toolbar-actions">
         <a class="toolbar-btn" href="/cv.pdf" download="Spyros-Ligouras-CV.pdf">Download PDF</a>
-        <button class="toolbar-btn toolbar-btn-primary" type="button" onclick="window.print()">Print</button>
+        <button class="toolbar-btn toolbar-btn-primary" type="button" onclick="window.print()">
+          Print
+        </button>
       </div>
-    </div>
+    </nav>
 
     <main class="sheet">
       <header class="cv-header">
-        <div>
+        <div class="identity">
           <h1>{profile.name}</h1>
-          <p class="headline">{profile.headline}</p>
+          <p class="title">{profile.title}</p>
+          <p class="focus">{focusAreas.join(" · ")}</p>
         </div>
         <ul class="contact-list">
+          {profile.email && (
+            <li><a href={`mailto:${profile.email}`}>{profile.email}</a></li>
+          )}
           <li>{profile.location}</li>
-          <li><a href={profile.website}>ligouras.com</a></li>
-          <li><a href={profile.github}>github.com/{profile.githubUsername}</a></li>
-          <li><a href={profile.linkedin}>linkedin.com/in/spyrosligouras</a></li>
+          <li><a href={profile.website}>{prettyUrl(profile.website)}</a></li>
+          <li><a href={profile.github}>{prettyUrl(profile.github)}</a></li>
+          <li><a href={profile.linkedin}>{prettyUrl(profile.linkedin)}</a></li>
         </ul>
       </header>
 
-      <section class="cv-section">
-        <h2>Profile</h2>
+      <section class="cv-section" aria-labelledby="profile-h">
+        <h2 id="profile-h">Profile</h2>
         <p class="summary">{profile.summary}</p>
       </section>
 
-      <section class="cv-section">
-        <h2>Ventures</h2>
+      <section class="cv-section" aria-labelledby="experience-h">
+        <h2 id="experience-h">Experience</h2>
         <div class="entries">
           {
-            profile.ventures.map((v) => (
-              <div class="entry">
-                <div class="entry-head">
-                  <div>
-                    <strong>{v.name}</strong> — <span class="role">{v.role}</span>
-                  </div>
-                  <span class="period">{v.period} · {v.location}</span>
+            experience.map((exp) => (
+              <article class="entry">
+                <div class="entry-row">
+                  <h3 class="org">{exp.company}</h3>
+                  <span class="meta">{exp.location}</span>
                 </div>
-                <p class="entry-desc">
-                  {v.summary}{" "}
-                  <a href={v.url}>{v.url.replace(/^https?:\/\//, "").replace(/\/$/, "")}</a>
-                </p>
-              </div>
-            ))
-          }
-        </div>
-      </section>
-
-      <section class="cv-section">
-        <h2>Experience</h2>
-        <div class="entries">
-          {
-            profile.experience.map((exp) => (
-              <div class="entry">
-                <div class="entry-head">
-                  <div>
-                    <strong>{exp.company}</strong>
-                    {exp.subroles.length === 0 && (
-                      <> — <span class="role">{exp.role}</span></>
-                    )}
+                {exp.roles.map((r) => (
+                  <div class="entry-row">
+                    <span class="role">{r.title}</span>
+                    <span class="meta">{r.period}</span>
                   </div>
-                  <span class="period">{exp.period} · {exp.location}</span>
-                </div>
-                {exp.subroles.length > 0 && (
-                  <div class="subroles">
-                    {exp.subroles.map((sr) => (
-                      <div class="subrole">
-                        <span class="role">{sr.title}</span>
-                        <span class="period">{sr.period}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-                {(exp.bullets.length > 0 || exp.projects.length > 0) && (
+                ))}
+                {exp.bullets.length > 0 && (
                   <ul class="bullets">
                     {exp.bullets.map((b) => (
                       <li>{b}</li>
                     ))}
-                    {exp.projects.length > 0 && (
-                      <li>
-                        <strong>Selected initiatives:</strong>{" "}
-                        {exp.projects.map((p, idx) => (
-                          <>
-                            {idx > 0 ? "; " : ""}
-                            <a href={p.url}>{p.title}</a> ({p.summary})
-                          </>
-                        ))}
-                      </li>
-                    )}
                   </ul>
                 )}
-              </div>
+              </article>
             ))
           }
         </div>
       </section>
 
-      <section class="cv-section">
-        <h2>Education</h2>
-        <div class="entries compact">
+      <section class="cv-section" aria-labelledby="education-h">
+        <h2 id="education-h">Education</h2>
+        <div class="entries">
           {
             profile.education.map((edu) => (
-              <div class="entry">
-                <div class="entry-head">
-                  <div>
-                    <strong>{edu.degree}</strong> — {edu.institution}
-                  </div>
-                  <span class="period">{edu.period}</span>
+              <article class="entry">
+                <div class="entry-row">
+                  <h3 class="org">{edu.degree}</h3>
+                  <span class="meta">{edu.period}</span>
                 </div>
+                <p class="role">{edu.institution}</p>
                 {edu.notes && <p class="entry-desc">{edu.notes}</p>}
-              </div>
+              </article>
             ))
           }
         </div>
       </section>
 
-      <section class="cv-section">
-        <h2>Publications &amp; Press</h2>
+      <section class="cv-section" aria-labelledby="pubs-h">
+        <h2 id="pubs-h">Publications &amp; Press</h2>
         <ul class="bullets">
           {
             profile.publications.map((pub) => (
               <li>
-                <strong>{pub.title}</strong> — {pub.venue}
+                {pub.url ? (
+                  <a class="strong-link" href={pub.url}>{pub.title}</a>
+                ) : (
+                  <strong>{pub.title}</strong>
+                )}{" "}
+                — {pub.venue}
                 {pub.year ? ` (${pub.year})` : ""}
               </li>
             ))
@@ -154,7 +157,7 @@ const profile = loadProfile();
           {
             profile.press.map((item) => (
               <li>
-                <strong>{item.title}</strong> — {item.outlet} ({item.date})
+                <a class="strong-link" href={item.url}>{item.title}</a> — {item.outlet} ({item.date})
               </li>
             ))
           }
@@ -203,7 +206,7 @@ const profile = loadProfile();
     --ink: #0f172a;
     --ink-muted: #475569;
     --ink-subtle: #64748b;
-    --accent: #2563eb;
+    --accent: #1d4ed8;
     --line: #cbd5e1;
     --paper: #ffffff;
     --bg: #f1f5f9;
@@ -231,6 +234,20 @@ const profile = loadProfile();
     text-decoration: none;
   }
 
+  a:hover {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  a:focus-visible,
+  button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 3px;
+  }
+
+  /* ---------- Screen chrome ---------- */
+
   .toolbar {
     max-width: 210mm;
     margin: 18px auto 0;
@@ -256,7 +273,10 @@ const profile = loadProfile();
     font: inherit;
     font-size: 0.85rem;
     font-weight: 500;
-    padding: 7px 14px;
+    min-height: 36px;
+    display: inline-flex;
+    align-items: center;
+    padding: 0 14px;
     border-radius: 7px;
     border: 1px solid var(--line);
     background: var(--paper);
@@ -264,10 +284,20 @@ const profile = loadProfile();
     cursor: pointer;
   }
 
+  .toolbar-btn:hover {
+    text-decoration: none;
+    border-color: var(--ink-subtle);
+  }
+
   .toolbar-btn-primary {
     background: var(--accent);
     border-color: var(--accent);
     color: #fff;
+  }
+
+  .toolbar-btn-primary:hover {
+    background: #1e40af;
+    border-color: #1e40af;
   }
 
   .sheet {
@@ -280,10 +310,12 @@ const profile = loadProfile();
     border-radius: 4px;
   }
 
+  /* ---------- Header ---------- */
+
   .cv-header {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
+    align-items: flex-end;
     gap: 20px;
     padding-bottom: 10px;
     border-bottom: 2px solid var(--ink);
@@ -292,17 +324,24 @@ const profile = loadProfile();
 
   h1 {
     font-family: "Archivo", sans-serif;
-    font-size: 21pt;
+    font-size: 22pt;
     font-weight: 700;
     letter-spacing: -0.02em;
     line-height: 1.1;
   }
 
-  .headline {
-    font-size: 10.5pt;
+  .title {
+    font-size: 11pt;
     font-weight: 600;
+    color: var(--ink);
+    margin-top: 3px;
+  }
+
+  .focus {
+    font-size: 9pt;
+    font-weight: 500;
     color: var(--accent);
-    margin-top: 2px;
+    letter-spacing: 0.02em;
   }
 
   .contact-list {
@@ -310,15 +349,17 @@ const profile = loadProfile();
     text-align: right;
     font-size: 8.5pt;
     color: var(--ink-muted);
-    line-height: 1.48;
+    line-height: 1.5;
   }
 
   .contact-list a {
     color: var(--ink-muted);
   }
 
+  /* ---------- Sections ---------- */
+
   .cv-section {
-    margin-bottom: 11px;
+    margin-bottom: 12px;
   }
 
   .cv-section h2 {
@@ -330,62 +371,54 @@ const profile = loadProfile();
     color: var(--accent);
     border-bottom: 1px solid var(--line);
     padding-bottom: 2px;
-    margin-bottom: 6px;
+    margin-bottom: 7px;
+    break-after: avoid;
   }
 
   .cv-section h2.mt {
-    margin-top: 8px;
+    margin-top: 9px;
   }
 
   .summary {
-    color: var(--ink);
     font-size: 9.2pt;
   }
 
   .entries {
     display: flex;
     flex-direction: column;
-    gap: 7px;
-  }
-
-  .entries.compact {
-    gap: 5px;
+    gap: 8px;
   }
 
   .entry {
     break-inside: avoid;
   }
 
-  .entry-head {
+  .entry-row {
     display: flex;
     justify-content: space-between;
     align-items: baseline;
-    gap: 12px;
+    gap: 4px 12px;
+    flex-wrap: wrap;
+  }
+
+  .org {
+    font-family: inherit;
+    font-size: 9.5pt;
+    font-weight: 600;
+    color: var(--ink);
   }
 
   .role {
-    color: var(--ink-muted);
+    font-size: 9pt;
     font-weight: 500;
+    color: var(--ink-muted);
   }
 
-  .period {
+  .meta {
     font-size: 8.2pt;
     color: var(--ink-subtle);
     white-space: nowrap;
-  }
-
-  .subroles {
-    margin-top: 2px;
-    display: flex;
-    flex-direction: column;
-    gap: 1px;
-  }
-
-  .subrole {
-    display: flex;
-    justify-content: space-between;
-    gap: 12px;
-    font-size: 8.8pt;
+    font-variant-numeric: tabular-nums;
   }
 
   .entry-desc {
@@ -407,8 +440,17 @@ const profile = loadProfile();
     color: var(--ink-muted);
   }
 
+  .bullets li::marker {
+    color: var(--ink-subtle);
+  }
+
   .bullets li strong {
     color: var(--ink);
+    font-weight: 600;
+  }
+
+  .strong-link {
+    font-weight: 600;
   }
 
   .grid-two {
@@ -417,6 +459,8 @@ const profile = loadProfile();
     gap: 18px;
     break-inside: avoid;
   }
+
+  /* ---------- Print ---------- */
 
   @media print {
     body {
@@ -434,23 +478,44 @@ const profile = loadProfile();
       box-shadow: none;
       border-radius: 0;
     }
+
+    p,
+    li {
+      orphans: 2;
+      widows: 2;
+    }
   }
 
+  /* ---------- Small screens ---------- */
+
   @media (max-width: 720px) {
-    .sheet {
-      padding: 20px;
-      margin: 10px auto 24px;
+    body {
+      font-size: 10pt;
     }
 
-    .cv-header,
-    .entry-head,
-    .grid-two {
+    .toolbar {
+      padding: 0 12px;
+    }
+
+    .sheet {
+      padding: 22px 18px;
+      margin: 10px 0 24px;
+      border-radius: 0;
+    }
+
+    .cv-header {
       flex-direction: column;
-      grid-template-columns: 1fr;
+      align-items: flex-start;
+      gap: 10px;
     }
 
     .contact-list {
       text-align: left;
+    }
+
+    .grid-two {
+      grid-template-columns: 1fr;
+      gap: 12px;
     }
   }
 </style>

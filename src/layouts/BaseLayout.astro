@@ -1,11 +1,27 @@
 ---
+// Self-hosted static weights: no third-party request before first paint.
+import "@fontsource/archivo/600.css";
+import "@fontsource/archivo/700.css";
+import "@fontsource/space-grotesk/400.css";
+import "@fontsource/space-grotesk/500.css";
+
 interface Props {
   title: string;
   description: string;
   url: string;
+  /** Social preview image (1200×630), path relative to the site root. */
+  image?: string;
+  imageAlt?: string;
 }
 
-const { title, description, url } = Astro.props;
+const {
+  title,
+  description,
+  url,
+  image = "/og.jpg",
+  imageAlt = "Spyros Ligouras — Senior Cloud & Software Engineer",
+} = Astro.props;
+const imageUrl = new URL(image, Astro.site ?? url).href;
 ---
 
 <!doctype html>
@@ -21,18 +37,20 @@ const { title, description, url } = Astro.props;
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
     <meta property="og:url" content={url} />
+    <meta property="og:image" content={imageUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={imageAlt} />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={imageUrl} />
+    <meta name="twitter:image:alt" content={imageAlt} />
 
     <link
       rel="icon"
       href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>L</text></svg>"
-    />
-
-    <!-- Fonts: Archivo (headings) + Space Grotesk (body) -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Space+Grotesk:wght@400;500&display=swap"
-      rel="stylesheet"
     />
   </head>
   <body>
@@ -46,8 +64,10 @@ const { title, description, url } = Astro.props;
     --surface: #111114;
     --surface-elevated: #18181b;
     --fg: #fafafa;
+    --fg-secondary: #d4d4d8;
     --muted: #a1a1aa;
-    --subtle: #71717a;
+    /* ≥ 4.5:1 on --bg and --surface (was #71717a, ~3.9:1). */
+    --subtle: #8b8b94;
     --border: #27272a;
     --accent: #2563eb;
     --accent-hover: #3b82f6;
