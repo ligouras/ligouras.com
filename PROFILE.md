@@ -24,7 +24,7 @@ summary: >-
 - period: 2025 – Present
 - location: Athens, Greece
 - url: https://devop.sh/
-- summary: DevOps, cloud infrastructure (AWS, GCP, Azure, Kubernetes), software engineering, AI transformation, and fractional CTO consultancy serving startups and scale-ups across Greece and the EU.
+- summary: Cloud infrastructure (AWS, GCP, Azure, Kubernetes), fractional DevOps, and AI transformation services for startups and scale-ups across Greece and the EU.
 
 ### LinkSentry
 - role: Co-Founder
@@ -42,8 +42,13 @@ summary: >-
 - subroles:
   - Senior Cloud Engineer | Jan 2023 – Present
   - Senior Software Engineer | Mar 2019 – Dec 2022
+- stack: AWS, Terraform, Python, Django, OpenStack, Linux
+- brief: Architecting and operating cloud infrastructure and software platforms for national research and public-sector digital services.
 - bullets:
-  - Architecting and operating cloud infrastructure and software platforms for national research and public-sector digital services.
+  - Build and operate AWS Services by GRNET (2023 – present), providing AWS cloud services to Greek academic and research institutions.
+  - Contribute to GRNET's EU Digital Identity Wallet work: the WE BUILD large-scale pilot (Digital Europe) and the deployment of the EUDI Wallet reference services (OpenID4VCI / OpenID4VP).
+  - Designed and implemented the interoperability framework for Gov.gr Digital Documents (2020 – 2022).
+  - SPRICE research project (2019 – 2020): designed a virtual machine placement algorithm based on Compute Units and evaluated an OpenStack prototype on GRNET's cloud infrastructure.
 - projects:
   - AWS Cloud Services | https://grnet.gr/en/services/cloud-services/aws/ | AWS cloud computing grants for the Greek research and academic community
   - WE BUILD | https://grnet.gr/business-directory/webuild/ | Digital Europe EU Digital Identity Wallet (EUDI) large-scale pilot
@@ -54,6 +59,7 @@ summary: >-
 - role: Partner
 - period: 2025 – Present
 - location: Athens, Greece
+- stack: AWS, GCP, Azure, Kubernetes, CI/CD
 - bullets:
   - Lead cloud audits, Kubernetes migrations, CI/CD automation, 24/7 managed operations, AI transformation, and fractional CTO engagements for European startups and scale-ups.
 
@@ -68,6 +74,7 @@ summary: >-
 - role: Independent Cloud & Infrastructure Consultant
 - period: Jan 2018 – Present
 - location: Athens, Greece
+- stack: Kubernetes, CI/CD, Linux
 - bullets:
   - Cloud architecture, Kubernetes and CI/CD delivery, infrastructure automation, Linux operations, and hands-on advisory for engineering teams.
   - Clients: Interstar Security, Epsilon International, PastorsLine.com, monTransport.com.
@@ -76,13 +83,16 @@ summary: >-
 - role: Software Engineer
 - period: Feb 2014 – Dec 2016
 - location: Singapore
+- stack: C, DPDK, Linux
 - bullets:
   - Specialized in Deep Packet Inspection (DPI) and Information Extraction technologies; owned the Layer 8 metadata extraction engine and contributed to R&D funded research projects.
+  - Protocol Decoders v1–v3: R&D on reverse engineering Web and VoIP communication protocols and extracting information from captured protocol traffic.
 
 ### Resin.io
 - role: Software Developer
 - period: Oct 2013 – Feb 2014
 - location: Athens, Greece
+- stack: Node.js, Linux, Raspberry Pi
 - bullets:
   - Built developer tooling and container deployment workflows enabling JavaScript/Node.js applications on embedded Linux devices (Raspberry Pi) via git push.
 
@@ -90,11 +100,14 @@ summary: >-
 - role: Software Developer
 - period: Oct 2012 – Feb 2014
 - location: Athens, Greece
+- bullets:
+  - Renew London: software for a distributed network of 200 recycling units in the City of London, each doubling as an information pod with dual street-side HD screens.
 
 ### ICS-FORTH (Distributed Computing Systems Lab)
 - role: Research Assistant
 - period: Mar 2009 – Feb 2011
 - location: Heraklion, Crete, Greece
+- brief: Web and systems security research; co-authored XSS and CSCF mitigation techniques.
 - bullets:
   - Conducted research in Web Security and Systems Security, co-authoring peer-reviewed mitigation techniques for Cross-Site Scripting (XSS) and Cross-Site Content Forgery (CSCF).
 
@@ -102,6 +115,7 @@ summary: >-
 - role: Software Developer
 - period: May 2003 – Jan 2009
 - location: Heraklion, Crete, Greece
+- brief: Network management tooling, alarm correlation, and 24x7 telemetry and SLA/QoS monitoring for backbone networks.
 - bullets:
   - Developed Network Management System (NMS) tooling for real-time alarm correlation and logging across all network elements.
   - Built 24x7 telemetry collection, traffic volume analysis, and SLA/QoS monitoring for backbone networks and corporate clients.
@@ -110,6 +124,7 @@ summary: >-
 - role: Software Developer (Intern)
 - period: Jul 2002 – Oct 2002
 - location: Heraklion, Crete, Greece
+- brief: Web applications in PHP and PostgreSQL.
 - bullets:
   - Undergraduate internship developing web applications with PHP and PostgreSQL.
 
@@ -129,6 +144,7 @@ summary: >-
 ### xJS: Practical XSS Prevention for Web Application Development
 - venue: 1st USENIX Conference on Web Application Development (WebApps '10), Boston
 - year: 2010
+- url: https://www.usenix.org/legacy/event/webapps10/tech/full_papers/Athanasopoulos.pdf
 
 ### xJS: Lightweight Cross-Site Scripting Prevention Using Isolation Operators
 - venue: Technical Publication
@@ -148,18 +164,19 @@ summary: >-
 
 ## Certifications
 
-- Certified Kubernetes Administrator (CKA)
-- Malicious Software and its Underground Economy: Two Sides to Every Story
+- Certified Kubernetes Administrator (CKA) | The Linux Foundation | | https://www.credly.com/badges/8622af48-4f81-47c8-b1d6-fa526a2261d7
 
 ## Honors
 
 - Winner of Copernicus Hackathon in Athens (2019, team FERON)
-- Graduate Research Fellowship (x2)
+- ICS-FORTH Graduate Research Fellowship
 
 ## Skills
 
-- Cloud & Infrastructure: Terraform, Kubernetes, Docker / Containerization, AWS, Google Cloud, Azure, Linux
-- Engineering & Security: Go, Node.js / TypeScript, Python, CI/CD, Web & Systems Security, Deep Packet Inspection
+- Cloud: AWS, Google Cloud, Azure, OpenStack
+- Platform & Automation: Kubernetes, Docker, Terraform, CI/CD, Linux
+- Programming: Python / Django, Go, C, Node.js / TypeScript
+- Security & Networking: Web & Systems Security, Deep Packet Inspection, DPDK, Network Telemetry
 
 ## Languages
 

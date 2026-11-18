@@ -27,6 +27,9 @@ const currentExperience = profile.experience
   )
   .map((exp) => ({
     ...exp,
+    // The homepage stays high level: a role's one-line `brief` replaces its
+    // detailed bullets, which live on the CV.
+    summaryBullets: exp.brief ? [exp.brief] : exp.bullets,
     projects: exp.projects.filter((p) => !homepageHiddenProjects.has(p.url)),
   }));
 const currentYear = new Date().getFullYear();
@@ -257,9 +260,9 @@ const socials = [
                 ) : (
                   <p class="timeline-role">{exp.role}</p>
                 )}
-                {exp.bullets.length > 0 && (
+                {exp.summaryBullets.length > 0 && (
                   <ul class="bullets">
-                    {exp.bullets.map((b) => (
+                    {exp.summaryBullets.map((b) => (
                       <li>{b}</li>
                     ))}
                   </ul>
@@ -344,8 +347,14 @@ const socials = [
           {
             profile.certifications.slice(0, 1).map((cert) => (
               <li>
-                <span>{cert}</span>
-                <small>Certification</small>
+                {cert.url ? (
+                  <a href={cert.url} target="_blank" rel="noopener">
+                    {cert.name} ↗
+                  </a>
+                ) : (
+                  <span>{cert.name}</span>
+                )}
+                <small>{cert.issuer ?? "Certification"}</small>
               </li>
             ))
           }

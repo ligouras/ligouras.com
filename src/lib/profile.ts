@@ -22,6 +22,13 @@ export interface ExperienceItem {
   period: string;
   location: string;
   subroles: { title: string; period: string }[];
+  /**
+   * One-line, high-level summary used wherever the role is shown condensed:
+   * the homepage timeline (instead of the bullets) and the CV's "Earlier experience".
+   */
+  brief?: string;
+  /** Technologies used in this role, from the comma-separated `stack:` field. */
+  stack: string[];
   bullets: string[];
   projects: ExperienceProject[];
 }
@@ -46,6 +53,14 @@ export interface PressItem {
   date: string;
   url: string;
   summary: string;
+}
+
+export interface Certification {
+  name: string;
+  issuer?: string;
+  /** Free text such as "valid through Mar 2027". */
+  note?: string;
+  url?: string;
 }
 
 export interface SkillGroup {
@@ -74,7 +89,7 @@ export interface Profile {
   education: EducationItem[];
   publications: PublicationItem[];
   press: PressItem[];
-  certifications: string[];
+  certifications: Certification[];
   honors: string[];
   skills: SkillGroup[];
   languages: string[];
@@ -228,6 +243,11 @@ export function loadProfile(): Profile {
       const [title, period = ""] = item.split("|").map((s) => s.trim());
       return { title, period };
     }),
+    brief: e.fields.brief,
+    stack: (e.fields.stack ?? "")
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean),
     bullets: e.lists.bullets ?? [],
     projects: (e.lists.projects ?? []).map((item) => {
       const [title, url = "", summary = ""] = item
@@ -299,7 +319,18 @@ export function loadProfile(): Profile {
     education,
     publications,
     press,
-    certifications: parseSimpleList(sections.get("Certifications") ?? ""),
+    // "Name | Issuer | Note | URL" — every part after the name is optional.
+    certifications: parseSimpleList(sections.get("Certifications") ?? "").map(
+      (line) => {
+        const [name, issuer, note, url] = line.split("|").map((s) => s.trim());
+        return {
+          name,
+          issuer: issuer || undefined,
+          note: note || undefined,
+          url: url || undefined,
+        };
+      },
+    ),
     honors: parseSimpleList(sections.get("Honors") ?? ""),
     skills,
     languages: parseSimpleList(sections.get("Languages") ?? ""),
