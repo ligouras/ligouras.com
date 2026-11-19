@@ -4,10 +4,10 @@ Personal site and CV for [ligouras.com](https://ligouras.com), built with Astro 
 
 ## Stack
 
-- **Single source of truth:** `PROFILE.md` drives both the homepage (`src/pages/index.astro`) and the printable CV (`src/pages/cv/index.astro` → `dist/cv.pdf`)
+- **Single source of truth:** `PROFILE.md` drives both the homepage (`src/pages/index.astro`) and the printable CV (`src/pages/cv/index.astro` → `dist/ligouras-cv.pdf`)
 - **Astro** static site with OLED dark theme (`#09090b`), `Archivo` + `Space Grotesk` typography, and `#2563eb` accent
 - **Build-time GitHub activity:** `src/lib/github-contributions.ts` fetches the 365-day contribution heatmap (without listing repos)
-- **CV PDF generation:** `scripts/generate-cv.mjs` prints `/cv/` to `dist/cv.pdf` via headless Chrome/Chromium
+- **CV PDF generation:** `scripts/generate-cv.mjs` prints `/cv/` to `dist/ligouras-cv.pdf` via headless Chrome/Chromium
 - **Unlisted static subpaths:** `hashimoto/`, `job/`, and `CNAME` are copied into `dist/` by `scripts/copy-static.mjs`
 
 ## Local development
@@ -17,7 +17,7 @@ npm install
 npm run dev
 ```
 
-To build the site + `dist/cv.pdf` (and optionally refresh `public/cv.pdf` as a fallback):
+To build the site + `dist/ligouras-cv.pdf` (and optionally refresh `public/ligouras-cv.pdf` as a fallback):
 
 ```bash
 npm run build

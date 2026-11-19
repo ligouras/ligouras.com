@@ -14,8 +14,8 @@ import { extname, join, resolve } from "node:path";
 
 const root = process.cwd();
 const distDir = resolve(root, "dist");
-const outPdf = resolve(distDir, "cv.pdf");
-const publicPdf = resolve(root, "public", "cv.pdf");
+const outPdf = resolve(distDir, "ligouras-cv.pdf");
+const publicPdf = resolve(root, "public", "ligouras-cv.pdf");
 
 const MIME_TYPES = {
   ".html": "text/html; charset=utf-8",
@@ -124,9 +124,9 @@ try {
   if (process.argv.includes("--sync-public")) {
     mkdirSync(resolve(root, "public"), { recursive: true });
     copyFileSync(outPdf, publicPdf);
-    console.log("Synced public/cv.pdf");
+    console.log("Synced public/ligouras-cv.pdf");
   }
-  console.log("Generated dist/cv.pdf");
+  console.log("Generated dist/ligouras-cv.pdf");
 } finally {
   server.close();
   rmSync(userDataDir, { recursive: true, force: true });
