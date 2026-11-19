@@ -3,6 +3,7 @@ import { Image } from "astro:assets";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import portrait from "../assets/portrait.webp";
 import ContributionGraph from "../components/ContributionGraph.astro";
+import SiteHeader from "../components/SiteHeader.astro";
 import SocialIcons from "../components/SocialIcons.astro";
 import { loadProfile } from "../lib/profile";
 import { getGitHubContributions } from "../lib/github-contributions";
@@ -98,40 +99,7 @@ const socials = [
   description={profile.summary}
   url={profile.website}
 >
-  <a class="skip-link" href="#main">Skip to content</a>
-
-  <header class="topbar" id="top">
-    <div class="topbar-inner">
-      <a class="brand" href="#top">
-        {profile.brand}<span class="accent">.</span>
-      </a>
-      <nav class="topnav" aria-label="Main">
-        <a class="nav-link" href="#ventures">Ventures</a>
-        <a class="nav-link" href="#experience">Experience</a>
-        <a class="nav-link" href="#activity">Activity</a>
-        <a class="nav-link" href="/cv/">CV</a>
-      </nav>
-      <div class="top-actions">
-        <a
-          class="icon-link"
-          href={profile.github}
-          aria-label="GitHub"
-          rel="me noopener"
-          target="_blank"
-        >
-          <SocialIcons icon="github" />
-        </a>
-        <a
-          class="nav-pill"
-          href="/ligouras-cv.pdf"
-          target="_blank"
-          rel="noopener"
-        >
-          CV (PDF)
-        </a>
-      </div>
-    </div>
-  </header>
+  <SiteHeader current="home" brand={profile.brand} github={profile.github} />
 
   <main class="container" id="main" tabindex="-1">
     <header class="hero">
@@ -401,124 +369,6 @@ const socials = [
 </BaseLayout>
 
 <style>
-  .topbar {
-    position: sticky;
-    top: 0;
-    z-index: 20;
-    background: rgba(9, 9, 11, 0.82);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border);
-  }
-
-  .topbar-inner {
-    width: 100%;
-    max-width: 880px;
-    margin: 0 auto;
-    padding: 12px 24px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-  }
-
-  .brand {
-    font-family: "Archivo", system-ui, sans-serif;
-    font-weight: 700;
-    font-size: 1.1rem;
-    letter-spacing: -0.02em;
-    color: var(--fg);
-  }
-
-  .brand .accent {
-    color: var(--accent-hover);
-  }
-
-  .topnav {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-  }
-
-  .nav-link {
-    font-size: 0.86rem;
-    color: var(--muted);
-    transition: color 160ms ease;
-  }
-
-  .nav-link:hover {
-    color: var(--fg);
-  }
-
-  .top-actions {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .icon-link {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    color: var(--muted);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    transition: color 160ms ease, border-color 160ms ease;
-  }
-
-  .icon-link:hover {
-    color: var(--fg);
-    border-color: var(--accent);
-  }
-
-  .icon-link :global(svg) {
-    width: 16px;
-    height: 16px;
-  }
-
-  .nav-pill {
-    font-size: 0.82rem;
-    font-weight: 500;
-    color: var(--fg);
-    background: var(--surface);
-    border: 1px solid var(--border);
-    padding: 5px 12px;
-    border-radius: 8px;
-    transition: border-color 160ms ease, background-color 160ms ease;
-    white-space: nowrap;
-  }
-
-  .nav-pill:hover {
-    border-color: var(--accent);
-    background: var(--surface-elevated);
-  }
-
-  /* Keep anchor jumps and keyboard-focused elements clear of the sticky bar. */
-  :global(html) {
-    scroll-padding-top: 72px;
-  }
-
-  .skip-link {
-    position: absolute;
-    top: 8px;
-    left: 8px;
-    z-index: 30;
-    padding: 8px 14px;
-    border-radius: 8px;
-    background: var(--accent);
-    color: #fff;
-    font-size: 0.88rem;
-    font-weight: 500;
-    transform: translateY(-150%);
-  }
-
-  .skip-link:focus-visible {
-    transform: none;
-  }
-
   main:focus {
     outline: none;
   }
@@ -1096,64 +946,6 @@ const socials = [
   }
 
   @media (max-width: 600px) {
-    /* Two-row header: brand + actions, then a full-width link strip. */
-    .topbar-inner {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      grid-template-areas:
-        "brand actions"
-        "nav   nav";
-      row-gap: 0;
-      padding: 10px 24px 0;
-    }
-
-    .brand {
-      grid-area: brand;
-      justify-self: start;
-      align-self: center;
-    }
-
-    .top-actions {
-      grid-area: actions;
-      gap: 8px;
-    }
-
-    .icon-link {
-      width: 36px;
-      height: 36px;
-    }
-
-    .nav-pill {
-      padding: 8px 12px;
-    }
-
-    .topnav {
-      grid-area: nav;
-      justify-content: space-between;
-      gap: 4px;
-      margin: 10px -24px 0;
-      padding: 0 16px;
-      border-top: 1px solid var(--border);
-      overflow-x: auto;
-      scrollbar-width: none;
-    }
-
-    .topnav::-webkit-scrollbar {
-      display: none;
-    }
-
-    .nav-link {
-      display: inline-flex;
-      align-items: center;
-      min-height: 40px;
-      padding: 0 8px;
-      white-space: nowrap;
-    }
-
-    :global(html) {
-      scroll-padding-top: 116px;
-    }
-
     /* Compact hero: portrait sits beside the wordmark + name. */
     .hero {
       grid-template-columns: auto minmax(0, 1fr);

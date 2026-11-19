@@ -5,6 +5,7 @@ import "@fontsource/archivo/700.css";
 import "@fontsource/space-grotesk/400.css";
 import "@fontsource/space-grotesk/500.css";
 import "@fontsource/space-grotesk/600.css";
+import SiteHeader from "../../components/SiteHeader.astro";
 import { loadProfile } from "../../lib/profile";
 
 const profile = loadProfile();
@@ -77,17 +78,9 @@ const earlierExperience = experience.filter(
     />
   </head>
   <body>
-    <nav class="toolbar no-print" aria-label="CV actions">
-      <a class="toolbar-link" href="/">← ligouras.com</a>
-      <div class="toolbar-actions">
-        <a class="toolbar-btn" href="/ligouras-cv.pdf" download="ligouras-cv.pdf">Download PDF</a>
-        <button class="toolbar-btn toolbar-btn-primary" type="button" onclick="window.print()">
-          Print
-        </button>
-      </div>
-    </nav>
+    <SiteHeader current="cv" brand={profile.brand} github={profile.github} />
 
-    <main class="sheet">
+    <main class="sheet" id="main" tabindex="-1">
       <header class="cv-header">
         <div class="identity">
           <h1>{profile.name}</h1>
@@ -336,66 +329,20 @@ const earlierExperience = experience.filter(
     border-radius: 3px;
   }
 
-  /* ---------- Screen chrome ---------- */
-
-  .toolbar {
-    max-width: 210mm;
-    margin: 18px auto 0;
-    padding: 0 4px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
+  main:focus {
+    outline: none;
   }
 
-  .toolbar-link {
-    font-size: 0.9rem;
-    color: var(--ink-muted);
-    font-weight: 500;
-  }
-
-  .toolbar-actions {
-    display: flex;
-    gap: 8px;
-  }
-
-  .toolbar-btn {
-    font: inherit;
-    font-size: 0.85rem;
-    font-weight: 500;
-    min-height: 36px;
-    display: inline-flex;
-    align-items: center;
-    padding: 0 14px;
-    border-radius: 7px;
-    border: 1px solid var(--line);
-    background: var(--paper);
-    color: var(--ink);
-    cursor: pointer;
-  }
-
-  .toolbar-btn:hover {
-    text-decoration: none;
-    border-color: var(--ink-subtle);
-  }
-
-  .toolbar-btn-primary {
-    background: var(--btn-bg);
-    border-color: var(--btn-bg);
-    color: #fff;
-  }
-
-  .toolbar-btn-primary:hover {
-    background: var(--btn-bg-hover);
-    border-color: var(--btn-bg-hover);
-  }
-
+  /*
+   * Same column as the homepage (880px minus 24px gutters). Padding starts at
+   * the homepage's 20px card padding on phones and doubles on wide screens, as
+   * suits a full-page document.
+   */
   .sheet {
-    width: 210mm;
-    max-width: 100%;
-    margin: 14px auto 36px;
+    width: min(832px, 100% - 48px);
+    margin: 28px auto 40px;
     background: var(--paper);
-    padding: 15mm 16mm;
+    padding: clamp(20px, 4vw, 40px);
     border: 1px solid var(--line);
     border-radius: 12px;
   }
@@ -652,13 +599,13 @@ const earlierExperience = experience.filter(
       font-size: 10pt;
     }
 
-    .toolbar {
-      padding: 0 12px;
-    }
-
+    /* No card on phones: content sits on the page with the homepage's gutters. */
     .sheet {
-      padding: 22px 18px;
-      margin: 10px 0 24px;
+      width: auto;
+      margin: 0;
+      padding: 28px 24px 48px;
+      background: none;
+      border: none;
       border-radius: 0;
     }
 

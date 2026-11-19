@@ -1,0 +1,330 @@
+---
+/**
+ * Sticky site header shared by the homepage and the CV page.
+ *
+ * Carries its own dark tokens because the CV page doesn't use BaseLayout
+ * (it defines light "paper" tokens for print). Hidden when printing.
+ */
+import SocialIcons from "./SocialIcons.astro";
+
+interface Props {
+  current: "home" | "cv";
+  brand: string;
+  github: string;
+}
+
+const { current, brand, github } = Astro.props;
+const isHome = current === "home";
+// Same-page anchors on the homepage; absolute links from anywhere else.
+const home = isHome ? "" : "/";
+const pdf = "/ligouras-cv.pdf";
+---
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+{
+  /* No id="top" here: the header is sticky, so it is always "in view" and a
+     #top link to it would never scroll. With no such id, browsers scroll
+     "#top" to the start of the document. */
+}
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href={isHome ? "#top" : "/"}>
+      {brand}<span class="accent">.</span>
+    </a>
+    <nav class="topnav" aria-label="Main">
+      <a class="nav-link" href={`${home}#ventures`}>Ventures</a>
+      <a class="nav-link" href={`${home}#experience`}>Experience</a>
+      <a class="nav-link" href={`${home}#activity`}>Activity</a>
+      <a
+        class="nav-link"
+        href="/cv/"
+        aria-current={current === "cv" ? "page" : undefined}>CV</a
+      >
+    </nav>
+    <div class="top-actions">
+      <a
+        class="icon-link"
+        href={github}
+        aria-label="GitHub"
+        rel="me noopener"
+        target="_blank"
+      >
+        <SocialIcons icon="github" />
+      </a>
+      <a class="nav-pill" href={pdf} download="ligouras-cv.pdf">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M12 4v11" />
+          <path d="m7 10 5 5 5-5" />
+          <path d="M5 20h14" />
+        </svg>
+        <span><span class="visually-hidden">Download </span>CV (PDF)</span>
+      </a>
+    </div>
+  </div>
+</header>
+
+<style>
+  .topbar,
+  .skip-link {
+    --hdr-bg: rgba(9, 9, 11, 0.82);
+    --hdr-surface: #111114;
+    --hdr-surface-elevated: #18181b;
+    --hdr-fg: #fafafa;
+    --hdr-muted: #a1a1aa;
+    --hdr-border: #27272a;
+    --hdr-accent: #2563eb;
+    --hdr-accent-hover: #3b82f6;
+  }
+
+  /* Self-contained reset: page-level resets are scoped and don't reach here. */
+  .topbar,
+  .topbar *,
+  .skip-link {
+    box-sizing: border-box;
+  }
+
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: var(--hdr-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--hdr-border);
+    font-family: "Space Grotesk", system-ui, -apple-system, sans-serif;
+    line-height: 1.6;
+  }
+
+  .topbar a {
+    text-decoration: none;
+  }
+
+  .topbar a:focus-visible,
+  .skip-link:focus-visible {
+    outline: 2px solid var(--hdr-accent);
+    outline-offset: 3px;
+  }
+
+  .topbar-inner {
+    width: 100%;
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .brand {
+    font-family: "Archivo", system-ui, sans-serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+    letter-spacing: -0.02em;
+    color: var(--hdr-fg);
+  }
+
+  .brand .accent {
+    color: var(--hdr-accent-hover);
+  }
+
+  .topnav {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .nav-link {
+    font-size: 0.86rem;
+    color: var(--hdr-muted);
+    transition: color 160ms ease;
+  }
+
+  .nav-link:hover,
+  .nav-link[aria-current="page"] {
+    color: var(--hdr-fg);
+  }
+
+  .top-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .icon-link {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: 1px solid var(--hdr-border);
+    background: var(--hdr-surface);
+    color: var(--hdr-muted);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition:
+      color 160ms ease,
+      border-color 160ms ease;
+  }
+
+  .icon-link:hover {
+    color: var(--hdr-fg);
+    border-color: var(--hdr-accent);
+  }
+
+  .icon-link :global(svg) {
+    width: 16px;
+    height: 16px;
+  }
+
+  .nav-pill {
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--hdr-fg);
+    background: var(--hdr-surface);
+    border: 1px solid var(--hdr-border);
+    padding: 5px 12px;
+    border-radius: 8px;
+    transition:
+      border-color 160ms ease,
+      background-color 160ms ease;
+    white-space: nowrap;
+  }
+
+  .nav-pill:hover {
+    border-color: var(--hdr-accent);
+    background: var(--hdr-surface-elevated);
+  }
+
+  .nav-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .nav-pill svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+  }
+
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* Keep anchor jumps and keyboard-focused elements clear of the sticky bar. */
+  :global(html) {
+    scroll-padding-top: 72px;
+  }
+
+  .skip-link {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    z-index: 30;
+    padding: 8px 14px;
+    border-radius: 8px;
+    background: var(--hdr-accent);
+    color: #fff;
+    font-family: "Space Grotesk", system-ui, -apple-system, sans-serif;
+    font-size: 0.88rem;
+    font-weight: 500;
+    text-decoration: none;
+    transform: translateY(-150%);
+  }
+
+  .skip-link:focus-visible {
+    transform: none;
+  }
+
+  @media (max-width: 600px) {
+    /* Two-row header: brand + actions, then a full-width link strip. */
+    .topbar-inner {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      grid-template-areas:
+        "brand actions"
+        "nav   nav";
+      row-gap: 0;
+      padding: 10px 24px 0;
+    }
+
+    .brand {
+      grid-area: brand;
+      justify-self: start;
+      align-self: center;
+    }
+
+    .top-actions {
+      grid-area: actions;
+      gap: 8px;
+    }
+
+    .icon-link {
+      width: 36px;
+      height: 36px;
+    }
+
+    .nav-pill {
+      padding: 8px 12px;
+    }
+
+    .topnav {
+      grid-area: nav;
+      justify-content: space-between;
+      gap: 4px;
+      margin: 10px -24px 0;
+      padding: 0 16px;
+      border-top: 1px solid var(--hdr-border);
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .topnav::-webkit-scrollbar {
+      display: none;
+    }
+
+    .nav-link {
+      display: inline-flex;
+      align-items: center;
+      min-height: 40px;
+      padding: 0 8px;
+      white-space: nowrap;
+    }
+
+    :global(html) {
+      scroll-padding-top: 116px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nav-link,
+    .icon-link,
+    .nav-pill {
+      transition: none;
+    }
+  }
+
+  @media print {
+    .topbar,
+    .skip-link {
+      display: none;
+    }
+  }
+</style>
